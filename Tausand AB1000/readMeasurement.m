@@ -25,23 +25,8 @@ C2Pow24=16777216;   %2^24
 
 %% Get device type
 device_type=getDeviceTypeFromName(abacus_object);
-% serial_name = get(abacus_object,'Name');
-% if contains(serial_name,"AB1004")
-%     device_type=1004;
-% elseif contains(serial_name,"AB1002")
-%     device_type=1002;
-% else
-%     device_type=DeviceTypeQuery(abacus_object);
-%     if (device_type ~= 1002) && (device_type ~= 1004)
-%         disp('Unknown device type')
-%         return
-%     end
-% end
-
 
 %% Read request and wait for data available in port
-
-
 
 numtries = 4;
 localmaxtimeout = maxtimeout/numtries;
@@ -225,50 +210,3 @@ data_out=data_out_2;
 labels_out = labelArray;
 
 end
-
-
-% function clearBuffer(abacus_object)
-%     bytesInPort = abacus_object.BytesAvailable;
-%     if bytesInPort > 0
-%         fread(abacus_object,bytesInPort); %clear buffer if any
-%         %disp('Buffer cleared')
-%     end
-% end
-
-% function writeSerial(abacus_object,command,address,value)
-%     if command == 'read'
-%         valCommand = 14;
-%     elseif command == 'write'
-%         valCommand = 15;
-%     else
-%         valCommand = 0;
-%     end
-%     aux=typecast(uint16(value),'uint8');
-%     dataMsb=aux(2);
-%     dataLsb=aux(1);
-%     word16=[2,valCommand,address,dataMsb,dataLsb,4];
-%     fwrite(abacus_object,word16);
-% end
-
-% function writeSerial32(abacus_object,command,address,value)
-%     if command == 'read'
-%         valCommand = 14;
-%     elseif command == 'write'
-%         valCommand = 15;
-%     else
-%         valCommand = 0;
-%     end
-%     aux=typecast(uint32(value),'uint8');
-%     dataMsb=aux(4);
-%     data2ndMsb=aux(3);
-%     data2ndLsb=aux(2);
-%     dataLsb=aux(1);
-%     word32=[2,valCommand,address,dataMsb,data2ndMsb,data2ndLsb,dataLsb,4];
-%     fwrite(abacus_object,word32);
-% end
-
-% function waitForBytes(abacus_object,expectedBytes,timeout)
-%     while (abacus_object.BytesAvailable < expectedBytes) && (toc < timeout)
-%         %waits until all bytes are available or a timeout happens
-%     end
-% end

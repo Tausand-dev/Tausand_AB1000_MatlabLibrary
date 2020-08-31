@@ -8,7 +8,9 @@ function [ value_ns ] = configureDelay( abacus_object, channel_char, value_ns )
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last revision: 31-May-2019
+% May 2019; Last update: 7-Jul-2020
+% v1.1 July 2020. Includes different resolutions, depending on each device.
+% Accepts AB1502, AB1504, AB1902, AB1904 as valid device types.
 
 numChannel = uint8(channel_char);
 if numChannel >= uint8('a')
@@ -17,14 +19,16 @@ elseif numChannel >= uint8('A')
     numChannel = numChannel - uint8('A') + 1;
 end
 
-%% Get device type
+%% Get device type and resolution
 device_type=getDeviceTypeFromName(abacus_object);
+resolution_ns = getResolutionFromName(abacus_object); %new on v1.1 (2020-07-07)
 
 %% Assign address for specific device type
-if device_type == 1002
+is32bitdevice = ~ismember(device_type,[1002,1502,1902]);%new on v1.1 (2020-07-07)
+if is32bitdevice %device_type == 1004, 1504, 1904
+    address = 64:67;    
+else%if device_type == 1002, 1502, 1902
     address = [0,4];
-else%if device_type == 1004
-    address = 64:67;
 end
 
 if (numChannel <= length(address)) && (numChannel > 0)
@@ -41,16 +45,15 @@ if value_ns < 0
 elseif value_ns > 100
     value_ns = 100; %maximum 100ns
 end
-value_ns = value_ns+2.5-rem(value_ns+2.5,5); %round to multiple of 5ns
+value_ns = value_ns+resolution_ns/2-rem(value_ns+resolution_ns/2,resolution_ns); %round to multiple of resolution_ns
 
 %% Write single register
-
-if device_type==1002
-    writeSerial(abacus_object,"write",address,value_ns);
-else%if device_type==1004
+if is32bitdevice %if device_type==1004, 1504, 1904
     value_nsToAbacus=convertEngToSci(value_ns,0,0,0);
     writeSerial32(abacus_object,"write",address,value_nsToAbacus)
-    value_ns=convertSciToEng(value_nsToAbacus);
+    value_ns=convertSciToEng(value_nsToAbacus);    
+else %if device_type==1002, 1502, 1902
+    writeSerial(abacus_object,"write",address,value_ns);
 end
 
 end

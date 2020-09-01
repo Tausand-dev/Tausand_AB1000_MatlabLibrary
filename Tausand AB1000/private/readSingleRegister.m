@@ -27,7 +27,6 @@ C2Pow24=16777216;   %2^24
 %% Read request and wait for data available in port
 
 numtries = 4;
-is32bitdevice = ~ismember(device_type,[1002,1502,1902]);%new on v1.1 (2020-07-07)
 localmaxtimeout = maxtimeout/numtries;
 if is32bitdevice %if device_type == 1004, 1504 or 1904
     expectedBytes = 8;

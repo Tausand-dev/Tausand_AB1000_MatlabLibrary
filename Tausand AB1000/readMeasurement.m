@@ -11,8 +11,8 @@ function [ data_out, labels_out ] = readMeasurement( abacus_object )
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 31-Aug-2020
-% v1.1 August 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904.
+% May 2019; Last update: 1-Sep-2020
+% v1.1 September 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904. Tested on AB1504.
 
 tStartLocal = tic;
 data_out = [];

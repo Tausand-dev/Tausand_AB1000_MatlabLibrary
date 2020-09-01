@@ -1,14 +1,18 @@
-function [ device_type ] = getDeviceTypeFromName( abacus_object )
+function [ device_type, is32bit, num_channels ] = getDeviceTypeFromName( abacus_object )
 %GETDEVICETYPEFROMNAME Obtains device type from the 'Name' parameter in a serial object.
 %   Gets the 'Name' parameter, searches for AB1x0x strings on it,
-%   and returns a number associated to the device. If the device type is
-%   not written in the 'Name', a Query is made to the connected device.
+%   and returns a number associated to the device. As a second parameter
+%   returns if the device_type uses a 32-bit address system. 2-channel
+%   devices use a 16-bit system, while 4 and 8-channel devices use a 32-bit
+%   system. As a third parameter returns the input channels.
+%   If the device type is not written in the 'Name', a Query is made to the 
+%   connected device.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 7-Jul-2020
+% May 2019; Last update: 31-Aug-2020
 % v1.1 July 2020. Includes AB1502, AB1504, AB1902, AB1904 as valid device
 % types.
 
@@ -33,5 +37,9 @@ function [ device_type ] = getDeviceTypeFromName( abacus_object )
             device_type=0;
         end
     end
+    
+    %new on v1.1:
+    is32bit = ~ismember(device_type,[1002,1502,1902]);
+    num_channels = mod(device_type,10); %last digit
 
 end

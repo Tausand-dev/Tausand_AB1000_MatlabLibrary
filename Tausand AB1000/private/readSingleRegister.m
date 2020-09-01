@@ -8,7 +8,7 @@ function [ data_out ] = readSingleRegister( abacus_object, address )
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last revision: 7-Jul-2020
+% May 2019; Last revision: 31-Aug-2020
 % v1.1 July 2020. Includes AB1502, AB1504, AB1902, AB1904 as valid device
 % types.
 
@@ -22,7 +22,7 @@ C2Pow16=65536;      %2^16
 C2Pow24=16777216;   %2^24
 
 %% Get device type
-device_type=getDeviceTypeFromName(abacus_object);
+[~,is32bitdevice]=getDeviceTypeFromName(abacus_object);
 
 %% Read request and wait for data available in port
 

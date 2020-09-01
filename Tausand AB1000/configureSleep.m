@@ -20,11 +20,10 @@ elseif numChannel >= uint8('A')
 end
 
 %% Get device type and resolution
-device_type=getDeviceTypeFromName(abacus_object);
+[~,is32bitdevice]=getDeviceTypeFromName(abacus_object);
 resolution_ns = getResolutionFromName(abacus_object); %new on v1.1 (2020-07-07)
 
 %% Assign address for specific device type
-is32bitdevice = ~ismember(device_type,[1002,1502,1902]);%new on v1.1 (2020-07-07)
 if is32bitdevice %if device_type == 1004, 1504 or 1904
     address = 72:75;
 else%if device_type == 1002, 1502 or 1902

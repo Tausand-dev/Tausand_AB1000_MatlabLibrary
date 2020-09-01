@@ -29,9 +29,7 @@ C2Pow16=65536;      %2^16
 C2Pow24=16777216;   %2^24
 
 %% Get device type
-device_type=getDeviceTypeFromName(abacus_object);
-is32bitdevice = ~ismember(device_type,[1002,1502,1902]);%new on v1.1 (2020-08-31)
-
+[~,is32bitdevice]=getDeviceTypeFromName(abacus_object);
 
 %% Read request and wait for data available in port
 numtries = 4;

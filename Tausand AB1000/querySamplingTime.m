@@ -10,8 +10,7 @@ function [ value_ms ] = querySamplingTime( abacus_object )
 % v1.1 August 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904.
 
 %% Get device type
-device_type=getDeviceTypeFromName(abacus_object);
-is32bitdevice = ~ismember(device_type,[1002,1502,1902]);%new on v1.1 (2020-08-31)
+[~,is32bitdevice]=getDeviceTypeFromName(abacus_object);
 
 %% Read addresses for specific device type
 if is32bitdevice %if device_type == 1004, 1504 or 1904

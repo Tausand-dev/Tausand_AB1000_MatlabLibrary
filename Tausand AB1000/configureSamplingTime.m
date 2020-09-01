@@ -11,8 +11,7 @@ function [ value_ms ] = configureSamplingTime( abacus_object , value_ms )
 % v1.1 July 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904.
 
 %% Get device type
-device_type=getDeviceTypeFromName(abacus_object);
-is32bitdevice = ~ismember(device_type,[1002,1502,1902]);%new on v1.1 (2020-07-07)
+[~,is32bitdevice]=getDeviceTypeFromName(abacus_object);
 
 %% Data validation: coerce
 if value_ms < 1

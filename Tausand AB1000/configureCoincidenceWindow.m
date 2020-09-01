@@ -12,8 +12,9 @@ function [ value_ns ] = configureCoincidenceWindow( abacus_object, value_ns )
 % Accepts AB1502, AB1504, AB1902, AB1904 as valid device types.
 
 %% Get device type and resolution
-device_type=getDeviceTypeFromName(abacus_object);
+[device_type,is32bitdevice]=getDeviceTypeFromName(abacus_object);
 resolution_ns = getResolutionFromName(abacus_object); %new on v1.1 (2020-07-07)
+
 
 %% Data validation: coerce
 if value_ns < resolution_ns %updated on v1.1 (2020-07-07)
@@ -34,7 +35,6 @@ num=floor(num/1000);
 value_us = num;
 
 %% Write addresses for specific device type
-is32bitdevice = ~ismember(device_type,[1002,1502,1902]);%new on v1.1 (2020-07-07)
 if is32bitdevice %if device_type == 1004, 1504 or 1904
     address = 81;
     value_nsToAbacus=convertEngToSci(value_ns,value_us,0,0);

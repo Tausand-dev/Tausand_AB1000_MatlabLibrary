@@ -6,7 +6,8 @@ function [ abacus_obj ] = openAbacus( port )
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last revision: 31-May-2019
+% May 2019; Last revision: 1-Sep-2020
+% v1.1 September 2020. Sets timeout=1s.
 
 %% Instrument Connection
 
@@ -28,7 +29,9 @@ set(obj1,'BaudRate',115200);    %required baud rate is 115200
 device_type_str=strcat(" AB",num2str(deviceTypeQuery(obj1)));
 serial_name = strcat(get(obj1,'Name'),device_type_str);
 set(obj1,'Name',serial_name);    %assign Tag to DeviceType
+set(obj1,'Timeout',1); %set timeout of device to 1s. By default Matlab sets timeout to 10s %new on v1.1
 abacus_obj = obj1;
+
 
 end
 

@@ -31,7 +31,6 @@ function [ device_type, is32bit, num_channels ] = getDeviceTypeFromName( abacus_
         device_type=1904;
     else
         device_type=deviceTypeQuery(abacus_object); %updated on v1.1 (2020-07-07)
-        
         %if not in valid devices list:
         if ~ismember(device_type,[1002,1004,1502,1504,1902,1904]) %updated on v1.1 (2020-07-07)
             %disp('Unknown device type')

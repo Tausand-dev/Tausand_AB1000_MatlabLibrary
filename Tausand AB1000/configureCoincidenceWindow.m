@@ -14,7 +14,7 @@ function [ value_ns ] = configureCoincidenceWindow( abacus_object, value_ns )
 %% Get device type and resolution
 [device_type,is32bitdevice]=getDeviceTypeFromName(abacus_object);
 resolution_ns = getResolutionFromName(abacus_object); %new on v1.1 (2020-07-07)
-%is32bitdevice = ~ismember(device_type,[1002,1502,1902]);%new on v1.1 (2020-07-07)
+
 
 %% Data validation: coerce
 if value_ns < resolution_ns %updated on v1.1 (2020-07-07)

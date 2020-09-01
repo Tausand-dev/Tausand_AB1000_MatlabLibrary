@@ -24,7 +24,6 @@ end
 resolution_ns = getResolutionFromName(abacus_object); %new on v1.1 (2020-07-07)
 
 %% Assign address for specific device type
-%is32bitdevice = ~ismember(device_type,[1002,1502,1902]);%new on v1.1 (2020-07-07)
 if is32bitdevice %device_type == 1004, 1504, 1904
     address = 64:67;    
 else%if device_type == 1002, 1502, 1902

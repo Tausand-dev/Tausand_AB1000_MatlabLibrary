@@ -12,7 +12,6 @@ function [ value_ms ] = configureSamplingTime( abacus_object , value_ms )
 
 %% Get device type
 [~,is32bitdevice]=getDeviceTypeFromName(abacus_object);
-%is32bitdevice = ~ismember(device_type,[1002,1502,1902]);%new on v1.1 (2020-07-07)
 
 %% Data validation: coerce
 if value_ms < 1

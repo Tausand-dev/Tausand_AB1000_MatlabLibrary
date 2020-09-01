@@ -11,13 +11,14 @@ function [ data_out, labels_out ] = readMeasurement( abacus_object )
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 31-Aug-2020
-% v1.1 August 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904.
+% May 2019; Last update: 1-Sep-2020
+% v1.1 September 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904. Tested on AB1504.
 
 tStartLocal = tic;
 data_out = [];
 labels_out = [];
-maxtimeout = 0.5;   %500ms
+maxtimeout = 0.5;    %500ms: timeout for the whole routine
+buffertimeout = 0.05; %50ms: timeout for a single input buffer read
 
 %some constants
 C2Pow8=256;         %2^8
@@ -119,24 +120,61 @@ while repeatRdWr == 1
         if tElapsedLocal > maxtimeout
             disp('Timeout error.')
             return
-        end    
-        firstByte=fread(abacus_object,1);
-        if firstByte ~= 126 %if first byte is not x"7E", quit
-            disp("Expected first byte is not correct. Read cancelled.");
-            return
+        end 
+        %numReads %testing
+        %i %testing
+        %firstByte=fread(abacus_object,1);
+        bytesavail = abacus_object.BytesAvailable;
+        tByteStart = tic;
+        tByteEnd = 0;
+        while (bytesavail < 2) && (tByteEnd < buffertimeout) %if there are not 2 bytes, wait for them (max timeout=100ms)
+            bytesavail = abacus_object.BytesAvailable; %check how many bytes are in input buffer
+            tByteEnd = toc(tByteStart); %get time since entered this while loop
         end
-        numBytes=fread(abacus_object,1); %2nd byte says number of bytes that follows
-        thisReadDatastream=fread(abacus_object,numBytes); %read N bytes
-        checksum=fread(abacus_object,1); %read checksum byte
+        if bytesavail >= 2
+            %if there are 2 bytes in buffer, read them
+            %[firstByte,count,msg]=fread(abacus_object,1);
+            firstByte=fread(abacus_object,1);
+            if firstByte ~= 126 %if first byte is not x"7E", quit
+                disp("Expected first byte is not correct. Read cancelled.");
+                return
+            end
+            numBytes=fread(abacus_object,1); %2nd byte says number of bytes that follows
+        else
+            firstByte=0;
+            numBytes=0;
+        end
+        %firstByte %testing
+        %count %testing
+        %msg %testing
+        
+        %numBytes %testing 2020-09-01
+        if numBytes > 0
+            bytesavail = abacus_object.BytesAvailable;
+            tByteStart = tic;
+            tByteEnd = 0;
+            while (bytesavail < numBytes) && (tByteEnd < buffertimeout) %if there are not enough bytes, wait for them (max timeout=100ms)
+                bytesavail = abacus_object.BytesAvailable;  %check how many bytes are in input buffer
+                tByteEnd = toc(tByteStart); %get time since entered this while loop
+            end
+            if bytesavail >= numBytes
+                thisReadDatastream=fread(abacus_object,numBytes); %read N bytes
+                %thisReadDatastream %testing
+                checksum=fread(abacus_object,1); %read checksum byte
 
-        %checksum verification
-        ver=uint8(sum(thisReadDatastream)+checksum);
-        if ver ~= 255
-            disp('Checksum failed. Read cancelled.')
-            return
+                %checksum verification
+                ver=uint8(sum(thisReadDatastream)+checksum);
+                if ver ~= 255
+                    disp('Checksum failed. Read cancelled.')
+                    return
+                end
+                readDatastream=[readDatastream;thisReadDatastream];
+                cumNumBytes = cumNumBytes + numBytes;
+            else %no valid bytes in port
+                disp('Missing data. Read cancelled.')
+                return
+            end
         end
-        readDatastream=[readDatastream;thisReadDatastream];
-        cumNumBytes = cumNumBytes + numBytes;
     end
 
     %% Organize datastream
@@ -194,6 +232,7 @@ while repeatRdWr == 1
         disp("Timeout error.");
         return
     end
+    %tElapsedLocal %testing
 end
 
 %% Get and return labels and data from read datastream

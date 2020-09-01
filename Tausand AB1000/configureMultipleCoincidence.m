@@ -21,7 +21,8 @@ function [ config_string, config_value ] = configureMultipleCoincidence( abacus_
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last revision: 31-May-2019
+% May 2019; Last revision: 7-Jul-2020
+% v1.1 July 2020. Includes AB1504 and AB1904 as valid device types.
 
     config_value = -1;
 
@@ -29,10 +30,13 @@ function [ config_string, config_value ] = configureMultipleCoincidence( abacus_
     device_type=getDeviceTypeFromName(abacus_object);
 
     %% Read addresses for specific device type
-    if device_type == 1002
-        disp('Multiple coincidence feature does not exist in Tausand Abacus AB1002.')
+    if ismember(device_type,[1002,1502,1902])
+        disp(['Multiple coincidence feature does not exist in Tausand Abacus ',num2str(device_type)])
         return
-    else%if device_type == 1004
+    elseif device_type == 0
+        disp('Non-valid device type')
+        return
+    else%if device_type == 1004, 1504 or 1904
 
         %% String coerce
         config_string = unique(char(upper(config_string))); %sorts and removes repeated letters

@@ -15,7 +15,8 @@ function [ data_out, labels_out ] = queryAllSettings( abacus_object )
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last revision: 31-May-2019
+% May 2019; Last update: 31-Aug-2020
+% v1.1 August 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904.
 
 tStartLocal = tic;
 data_out = [];
@@ -28,16 +29,16 @@ C2Pow16=65536;      %2^16
 C2Pow24=16777216;   %2^24
 
 %% Get device type
-device_type=getDeviceTypeFromName(abacus_object);
-
+[~,is32bitdevice]=getDeviceTypeFromName(abacus_object);
+%is32bitdevice = ~ismember(device_type,[1002,1502,1902]);%new on v1.1 (2020-08-31)
 
 %% Read request and wait for data available in port
 numtries = 4;
 localmaxtimeout = maxtimeout/numtries;
-if device_type == 1002
-    expectedBytes = 69; %3*22 values + 2 prefix + 1 checksum
-else%if device_type == 1004
+if is32bitdevice %if device_type == 1004, 1504 or 1904
     expectedBytes = 67; %5*11 values + 4*(2 prefix + 1 checksum)
+else%if device_type == 1002, 1502 or 1902
+    expectedBytes = 69; %3*22 values + 2 prefix + 1 checksum        
 end
 
 address=[64,72,80,88];
@@ -50,13 +51,22 @@ while repeatRdWr == 1
     while repeatWr == 1
         clearBuffer(abacus_object); % clear buffer
 
-        if device_type == 1002
-            writeSerial(abacus_object,'read',0,22); % send command to Abacus
-        else%if device_type == 1004
+        if is32bitdevice %if device_type == 1004, 1504 or 1904
             for k=av
                 writeSerial32(abacus_object,'read',k(1),k(2)); % send 6 commands to Abacus
             end
+        else%if device_type == 1002, 1502 or 1902
+            writeSerial(abacus_object,'read',0,22); % send command to Abacus
         end
+        
+%         %%old code, v1.0
+%         if device_type == 1002
+%             writeSerial(abacus_object,'read',0,22); % send command to Abacus
+%         else%if device_type == 1004
+%             for k=av
+%                 writeSerial32(abacus_object,'read',k(1),k(2)); % send 6 commands to Abacus
+%             end
+%         end
 
         waitForBytes(abacus_object,expectedBytes,localmaxtimeout);
         
@@ -77,11 +87,16 @@ while repeatRdWr == 1
 
     readDatastream=[];
     cumNumBytes = 0;
-    if device_type == 1002
-        numReads=1;
-    else%if device_type == 1004
+    if is32bitdevice %if device_type == 1004, 1504 or 1904
         numReads=4;
+    else%if device_type == 1002, 1502 or 1902
+        numReads=1;
     end
+%     if device_type == 1002
+%         numReads=1;
+%     else%if device_type == 1004
+%         numReads=4;
+%     end
 
     for i=1:numReads
         tElapsedLocal = toc(tStartLocal);
@@ -109,21 +124,33 @@ while repeatRdWr == 1
     end
 
     %% Organize datastream
-    if device_type == 1002
-        readDatastream=reshape(readDatastream,3,cumNumBytes/3); %1-byte address + 2-bytes value
-    else%if device_type == 1004
+    if is32bitdevice %if device_type == 1004, 1504 or 1904
         readDatastream=reshape(readDatastream,5,cumNumBytes/5);%1-byte address + 4-bytes value
+    else%if device_type == 1002, 1502 or 1902
+        readDatastream=reshape(readDatastream,3,cumNumBytes/3); %1-byte address + 2-bytes value
     end
+%     if device_type == 1002
+%         readDatastream=reshape(readDatastream,3,cumNumBytes/3); %1-byte address + 2-bytes value
+%     else%if device_type == 1004
+%         readDatastream=reshape(readDatastream,5,cumNumBytes/5);%1-byte address + 4-bytes value
+%     end
     addresses_out=readDatastream(1,:)';
     data_out=readDatastream(2:end,:)';
-
-    if device_type == 1004
+    
+    if is32bitdevice %if device_type == 1004, 1504 or 1904
         data_out=data_out(:,1)*C2Pow24+data_out(:,2)*C2Pow16+data_out(:,3)*C2Pow8+data_out(:,4);
         addresses_ok=isequal(sort(addresses_out)',[64:67,72:75,80,81,88]);
-    else%if device_type == 1002
+    else%if device_type == 1002, 1502 or 1902
         data_out=data_out(:,1)*C2Pow8+data_out(:,2); %first byte * 2^8 + second byte
         addresses_ok=isequal(sort(addresses_out)',0:21);
     end
+%     if device_type == 1004
+%         data_out=data_out(:,1)*C2Pow24+data_out(:,2)*C2Pow16+data_out(:,3)*C2Pow8+data_out(:,4);
+%         addresses_ok=isequal(sort(addresses_out)',[64:67,72:75,80,81,88]);
+%     else%if device_type == 1002
+%         data_out=data_out(:,1)*C2Pow8+data_out(:,2); %first byte * 2^8 + second byte
+%         addresses_ok=isequal(sort(addresses_out)',0:21);
+%     end
 
     tElapsedLocal = toc(tStartLocal);
     if addresses_ok
@@ -137,30 +164,30 @@ while repeatRdWr == 1
 end
 
 %% Get and return labels and data from read datastream
-
-if device_type == 1002
-    labelArray=["sampling";"coincidence_window";
-        "delay_A";"delay_B";
-        "sleep_A";"sleep_B"];
-else%if device_type == 1004
+if is32bitdevice %if device_type == 1004, 1504 or 1904
     labelArray=["sampling";"coincidence_window";
         "delay_A";"delay_B";"delay_C";"delay_D";
         "sleep_A";"sleep_B";"sleep_C";"sleep_D";
         "config_multiple_1"];
+else%if device_type == 1002, 1502 or 1902
+    labelArray=["sampling";"coincidence_window";
+        "delay_A";"delay_B";
+        "sleep_A";"sleep_B"];
 end
+% if device_type == 1002
+%     labelArray=["sampling";"coincidence_window";
+%         "delay_A";"delay_B";
+%         "sleep_A";"sleep_B"];
+% else%if device_type == 1004
+%     labelArray=["sampling";"coincidence_window";
+%         "delay_A";"delay_B";"delay_C";"delay_D";
+%         "sleep_A";"sleep_B";"sleep_C";"sleep_D";
+%         "config_multiple_1"];
+% end
 
 data_out_2=zeros(length(labelArray),1);
 
-if device_type == 1002
-    % Method 1: prefixed addresses. Takes less than 0.1ms to run
-    data_out_2(1,1)=data_out(addresses_out==18)+1000*data_out(addresses_out==19); %sampling
-    data_out_2(2,1)=data_out(addresses_out==20)+1000*data_out(addresses_out==21); %coincidence_window
-    data_out_2(3,1)=data_out(addresses_out==0); %delay_A
-    data_out_2(4,1)=data_out(addresses_out==4); %delay_B
-    data_out_2(5,1)=data_out(addresses_out==8); %sleep_A
-    data_out_2(6,1)=data_out(addresses_out==12); %sleep_B
-
-else %if device_type == 1004
+if is32bitdevice %if device_type == 1004, 1504 or 1904
     aux=data_out(addresses_out==80); %sampling
     [~,~,value_ms,value_s]=convertSciToEng(aux);
     data_out_2(1,1)=value_ms + 1000*value_s;
@@ -194,8 +221,62 @@ else %if device_type == 1004
     data_out_2(10,1)=convertSciToEng(aux); %get value_ns
     
     data_out_2(11,1)=data_out(addresses_out==88); %config_multiple_1
-    
+
+else%if device_type == 1002, 1502 or 1902
+    % Method 1: prefixed addresses. Takes less than 0.1ms to run
+    data_out_2(1,1)=data_out(addresses_out==18)+1000*data_out(addresses_out==19); %sampling
+    data_out_2(2,1)=data_out(addresses_out==20)+1000*data_out(addresses_out==21); %coincidence_window
+    data_out_2(3,1)=data_out(addresses_out==0); %delay_A
+    data_out_2(4,1)=data_out(addresses_out==4); %delay_B
+    data_out_2(5,1)=data_out(addresses_out==8); %sleep_A
+    data_out_2(6,1)=data_out(addresses_out==12); %sleep_B
+
 end
+% if device_type == 1002
+%     % Method 1: prefixed addresses. Takes less than 0.1ms to run
+%     data_out_2(1,1)=data_out(addresses_out==18)+1000*data_out(addresses_out==19); %sampling
+%     data_out_2(2,1)=data_out(addresses_out==20)+1000*data_out(addresses_out==21); %coincidence_window
+%     data_out_2(3,1)=data_out(addresses_out==0); %delay_A
+%     data_out_2(4,1)=data_out(addresses_out==4); %delay_B
+%     data_out_2(5,1)=data_out(addresses_out==8); %sleep_A
+%     data_out_2(6,1)=data_out(addresses_out==12); %sleep_B
+% 
+% else %if device_type == 1004
+%     aux=data_out(addresses_out==80); %sampling
+%     [~,~,value_ms,value_s]=convertSciToEng(aux);
+%     data_out_2(1,1)=value_ms + 1000*value_s;
+%     
+%     aux=data_out(addresses_out==81); %coincidence_window
+%     [value_ns,value_us]=convertSciToEng(aux);
+%     data_out_2(2,1)=value_ns + 1000*value_us;
+%     
+%     aux=data_out(addresses_out==64); %delay_A
+%     data_out_2(3,1)=convertSciToEng(aux); %get value_ns
+%     
+%     aux=data_out(addresses_out==65); %delay_B
+%     data_out_2(4,1)=convertSciToEng(aux); %get value_ns
+%     
+%     aux=data_out(addresses_out==66); %delay_C
+%     data_out_2(5,1)=convertSciToEng(aux); %get value_ns
+%     
+%     aux=data_out(addresses_out==67); %delay_D
+%     data_out_2(6,1)=convertSciToEng(aux); %get value_ns
+%     
+%     aux=data_out(addresses_out==72); %sleep_A
+%     data_out_2(7,1)=convertSciToEng(aux); %get value_ns
+%     
+%     aux=data_out(addresses_out==73); %sleep_B
+%     data_out_2(8,1)=convertSciToEng(aux); %get value_ns
+%     
+%     aux=data_out(addresses_out==74); %sleep_C
+%     data_out_2(9,1)=convertSciToEng(aux); %get value_ns
+%     
+%     aux=data_out(addresses_out==75); %sleep_D
+%     data_out_2(10,1)=convertSciToEng(aux); %get value_ns
+%     
+%     data_out_2(11,1)=data_out(addresses_out==88); %config_multiple_1
+%     
+% end
 data_out=data_out_2;
 labels_out = labelArray;
 

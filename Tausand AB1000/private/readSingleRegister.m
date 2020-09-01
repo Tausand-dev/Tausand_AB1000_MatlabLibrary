@@ -1,14 +1,16 @@
 function [ data_out ] = readSingleRegister( abacus_object, address )
 %READSINGLEREGISTER Reads a single register within a Tausand AB1000 device
 %   User must specify abacus_object and register address. 
-%   This function handles each device type (AB1002 or AB1004) to read it in 
-%   the required format.
+%   This function handles each device type (AB1x0x) to read it in the 
+%   required format.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last revision: 31-May-2019
+% May 2019; Last revision: 31-Aug-2020
+% v1.1 July 2020. Includes AB1502, AB1504, AB1902, AB1904 as valid device
+% types.
 
 tStartRead = tic;
 maxtimeout = 0.5;   %500ms
@@ -20,16 +22,16 @@ C2Pow16=65536;      %2^16
 C2Pow24=16777216;   %2^24
 
 %% Get device type
-device_type=getDeviceTypeFromName(abacus_object);
+[~,is32bitdevice]=getDeviceTypeFromName(abacus_object);
 
 %% Read request and wait for data available in port
 
 numtries = 4;
 localmaxtimeout = maxtimeout/numtries;
-if device_type == 1002
-    expectedBytes = 6;
-else%if device_type == 1004
+if is32bitdevice %if device_type == 1004, 1504 or 1904
     expectedBytes = 8;
+else %if device_type == 1002, 1502 or 1902
+    expectedBytes = 6;
 end
 
 repeatRdWr = 1;
@@ -38,10 +40,10 @@ while repeatRdWr == 1
     while repeatWr == 1
         clearBuffer(abacus_object); % clear buffer
 
-        if device_type == 1002
-            writeSerial(abacus_object,"read",address,0); % send command to Abacus
-        else%if device_type == 1004
+        if is32bitdevice %updated on v1.1 (2020-07-07)
             writeSerial32(abacus_object,"read",address,0); % send command to Abacus
+        else
+            writeSerial(abacus_object,"read",address,0); % send command to Abacus            
         end
 
         waitForBytes(abacus_object,expectedBytes,localmaxtimeout);
@@ -89,19 +91,19 @@ while repeatRdWr == 1
 
     %% Organize datastream
 
-    if device_type == 1002
-        readDatastream=reshape(readDatastream,3,cumNumBytes/3); %1-byte address + 2-bytes value
-    else%if device_type == 1004
+    if is32bitdevice %device_type == 1004, 1504 or 1904
         readDatastream=reshape(readDatastream,5,cumNumBytes/5);%1-byte address + 4-bytes value
+    else%if device_type == 1002, 1502 or 1902
+        readDatastream=reshape(readDatastream,3,cumNumBytes/3); %1-byte address + 2-bytes value        
     end
     addresses_out=readDatastream(1,:)';
     data_out=readDatastream(2:end,:)';
 
     addresses_ok=isequal(addresses_out(1),address);%single address
     
-    if device_type == 1004
+    if is32bitdevice %device_type == 1004, 1504 or 1904
         data_out=data_out(:,1)*C2Pow24+data_out(:,2)*C2Pow16+data_out(:,3)*C2Pow8+data_out(:,4);
-    else%if device_type == 1002
+    else%if device_type == 1002, 1502 or 1902
         data_out=data_out(:,1)*C2Pow8+data_out(:,2); %first byte * 2^8 + second byte
     end
 

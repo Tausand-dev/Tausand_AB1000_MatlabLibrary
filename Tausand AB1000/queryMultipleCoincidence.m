@@ -19,8 +19,15 @@ function [ config_string, config_value ] = queryMultipleCoincidence( abacus_obje
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 31-Aug-2020
+% May 2019; Last update: 11-Mar-2021
 % v1.1 August 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904.
+
+%% Input validation
+if ~isa(abacus_object,'serial')
+    errorStruct.message = 'Input must be a serial port object.';
+    errorStruct.identifier = 'TAUSAND:incorrectType';
+    error(errorStruct)
+end
 
 config_value = -1;
 config_string = "";
@@ -38,7 +45,7 @@ if is32bitdevice %if device_type == 1004, 1504 or 1904
     allChannels='A':'H';
     config_string=allChannels(selectedChannels);
 else%if device_type == 1002, 1502 or 1902
-    disp(['Multiple coincidence feature does not exist in Tausand Abacus ',num2str(device_type)])
+    warning('TAUSAND:incorrectType',['Multiple coincidence feature does not exist in Tausand Abacus ',num2str(device_type)])
     return
 end
 

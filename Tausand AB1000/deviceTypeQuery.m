@@ -6,10 +6,18 @@ function [ device_type ] = deviceTypeQuery( abacus_object )
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 7-Jul-2020
+% May 2019; Last update: 10-Mar-2021
 % v1.1 July 2020. Includes AB1502, AB1504, AB1902, AB1904 as valid device
 % types.
 
+%% Input validation
+if ~isa(abacus_object,'serial')
+    errorStruct.message = 'Input must be a serial port object.';
+    errorStruct.identifier = 'TAUSAND:incorrectType';
+    error(errorStruct)     
+end
+
+%% Function code
 text=idnQuery(abacus_object);
 if isempty(text)
     text="";

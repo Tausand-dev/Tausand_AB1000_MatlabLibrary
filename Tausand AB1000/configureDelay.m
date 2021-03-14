@@ -8,10 +8,32 @@ function [ value_ns ] = configureDelay( abacus_object, channel_char, value_ns )
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 7-Jul-2020
+% May 2019; Last update: 10-Mar-2021
 % v1.1 July 2020. Includes different resolutions, depending on each device.
 % Accepts AB1502, AB1504, AB1902, AB1904 as valid device types.
 
+%% Input validation
+if ~isa(abacus_object,'serial')
+    errorStruct.message = 'Input ''abacus_object'' must be a serial port object.';
+    errorStruct.identifier = 'TAUSAND:incorrectType';
+    error(errorStruct)    
+end
+if ~isnumeric(value_ns)
+    errorStruct.message = 'Input ''value_ns'' must be a number.';
+    errorStruct.identifier = 'TAUSAND:incorrectType';
+    error(errorStruct)    
+end
+if isstring(channel_char)
+    %if input is a string, convert to a char array
+    channel_char = char(channel_char);
+end
+if length(channel_char)> 1
+    errorStruct.message = 'Input ''channel_char'' must be a single char.';
+    errorStruct.identifier = 'TAUSAND:incorrectType';
+    error(errorStruct)
+end
+
+%build numChannel array mapping channel_char: A-->1, B-->2,...
 numChannel = uint8(channel_char);
 if numChannel >= uint8('a')
     numChannel = numChannel - uint8('a') + 1;
@@ -34,8 +56,9 @@ if (numChannel <= length(address)) && (numChannel > 0)
    address =  address(numChannel);
 else
    address = 0;
-   disp('Invalid channel char.')
-   return
+   errorStruct.message = 'Input ''channel_char'' is not a valid channel.';
+   errorStruct.identifier = 'TAUSAND:invalidInput';
+   error(errorStruct)
 end
 
 %% Data validation: coerce
@@ -54,6 +77,8 @@ if is32bitdevice %if device_type==1004, 1504, 1904
 else %if device_type==1002, 1502, 1902
     writeSerial(abacus_object,"write",address,value_ns);
 end
+
+value_ns = uint32(value_ns);
 
 end
 

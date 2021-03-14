@@ -6,8 +6,16 @@ function [ value_ms ] = querySamplingTime( abacus_object )
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 31-Aug-2020
+% May 2019; Last update: 11-Mar-2021
 % v1.1 August 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904.
+%      March 2021. Returns unsigned integer.
+
+%% Input validation
+if ~isa(abacus_object,'serial')
+    errorStruct.message = 'Input must be a serial port object.';
+    errorStruct.identifier = 'TAUSAND:incorrectType';
+    error(errorStruct)        
+end
 
 %% Get device type
 [~,is32bitdevice]=getDeviceTypeFromName(abacus_object);
@@ -26,6 +34,6 @@ end
 
 
 %% Calculate value in ms
-value_ms = value_ms + value_s*1000;
+value_ms = uint32(value_ms + value_s*1000);
 
 end

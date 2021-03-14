@@ -24,6 +24,13 @@ function [ config_string, config_value ] = configureMultipleCoincidence( abacus_
 % May 2019; Last revision: 7-Jul-2020
 % v1.1 July 2020. Includes AB1504 and AB1904 as valid device types.
 
+    %% Input validation
+    if ~isa(abacus_object,'serial')
+        errorStruct.message = 'Input ''abacus_object'' must be a serial port object.';
+        errorStruct.identifier = 'TAUSAND:incorrectType';
+        error(errorStruct)   
+    end
+
     config_value = -1;
 
     %% Get device type
@@ -31,11 +38,13 @@ function [ config_string, config_value ] = configureMultipleCoincidence( abacus_
 
     %% Read addresses for specific device type
     if ismember(device_type,[1002,1502,1902])
-        disp(['Multiple coincidence feature does not exist in Tausand Abacus ',num2str(device_type)])
+        warning('TAUSAND:incorrectType',['Multiple coincidence feature does not exist in Tausand Abacus ',num2str(device_type)])
         return
     elseif device_type == 0
-        disp('Non-valid device type')
-        return
+        errorStruct.message = 'Non-valid device type found for multiple coincidences.';
+        errorStruct.identifier = 'TAUSAND:incorrectType';
+        error(errorStruct)
+        %return
     else%if device_type == 1004, 1504 or 1904
 
         %% String coerce
@@ -47,8 +56,10 @@ function [ config_string, config_value ] = configureMultipleCoincidence( abacus_
             valid_string = isequal('ABCD',config_string);  %is the only 4-fold valid case?
         else
             valid_string = false;
-            disp('String must have 3 or 4 different letters. Multi-fold configuration cancelled.')
-            return
+            errorStruct.message = 'Input ''config_string'' must have 3 or 4 different letters. Multi-fold configuration cancelled.';
+            errorStruct.identifier = 'TAUSAND:invalidInput';
+            error(errorStruct)
+            %return
         end
 
         %% Config_value calculation    
@@ -62,8 +73,11 @@ function [ config_string, config_value ] = configureMultipleCoincidence( abacus_
             end
             config_value = bitshift(config_value,4); %E..H for future use
         else
-            disp('Invalid string. Multi-fold configuration cancelled.')
-            return
+            %error('Invalid string. Multi-fold configuration cancelled.')
+            errorStruct.message = 'Invalid input ''config_string''. Multi-fold configuration cancelled.';
+            errorStruct.identifier = 'TAUSAND:invalidInput';
+            error(errorStruct)
+            %return
         end
 
         %% Write operation

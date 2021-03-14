@@ -15,9 +15,17 @@ function [ data_out, labels_out ] = queryAllSettings( abacus_object )
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 31-Aug-2020
+% May 2019; Last update: 11-Mar-2021
 % v1.1 August 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904.
 
+%% Input validation
+if ~isa(abacus_object,'serial')
+    errorStruct.message = 'Input must be a serial port object.';
+    errorStruct.identifier = 'TAUSAND:incorrectType';
+    error(errorStruct)     
+end
+
+%% Function code
 tStartLocal = tic;
 data_out = [];
 labels_out = [];
@@ -100,23 +108,34 @@ while repeatRdWr == 1
     for i=1:numReads
         tElapsedLocal = toc(tStartLocal);
         if tElapsedLocal > maxtimeout
-            disp('Timeout error.')
+            warning('TAUSAND:timeout','Timeout in function queryAllSettings.')
             return
         end    
         firstByte=fread(abacus_object,1);
-        if firstByte ~= 126 %if first byte is not x"7E", quit
-            disp("Expected first byte is not correct. Read cancelled.");
-            return
+        %v1.1: scan for available bytes until x"7E" is found
+        while (abacus_object.BytesAvailable>0) && (firstByte ~= 126)
+            firstByte=fread(abacus_object,1);
+        end
+        if firstByte ~= 126 %not found within available bytes
+            %char(firstByte)
+            errorStruct.message = 'Expected first byte is not correct. Read cancelled.';
+            errorStruct.identifier = 'TAUSAND:unexpectedReadByte';
+            error(errorStruct) 
+            %return
         end
         numBytes=fread(abacus_object,1); %2nd byte says number of bytes that follows
+        waitForBytes(abacus_object,numBytes,0.1);    %timeout 100ms
         thisReadDatastream=fread(abacus_object,numBytes); %read N bytes
         checksum=fread(abacus_object,1); %read checksum byte
 
         %checksum verification
         ver=uint8(sum(thisReadDatastream)+checksum);
         if ver ~= 255
-            disp('Checksum failed. Read cancelled.')
-            return
+            %error('Checksum failed. Read cancelled.')
+            errorStruct.message = 'Checksum failed. Read cancelled.';
+            errorStruct.identifier = 'TAUSAND:checksumFailed';
+            error(errorStruct) 
+            %return
         end
         readDatastream=[readDatastream;thisReadDatastream];
         cumNumBytes = cumNumBytes + numBytes;
@@ -157,7 +176,7 @@ while repeatRdWr == 1
     elseif tElapsedLocal < maxtimeout
         repeatRdWr = 1; %do repeat, if there is time to do it
     else
-        disp("Timeout error.");
+        warning('TAUSAND:timeout','Timeout in function queryAllSettings.');
         return
     end
 end
@@ -276,7 +295,7 @@ end
 %     data_out_2(11,1)=data_out(addresses_out==88); %config_multiple_1
 %     
 % end
-data_out=data_out_2;
+data_out=uint32(data_out_2); %2021-03: returns unsigned integer array
 labels_out = labelArray;
 
 end

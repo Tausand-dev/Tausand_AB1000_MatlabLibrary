@@ -12,6 +12,9 @@ findDevices(0)      %searches for any device of the Tausand Abacus family
 my_ports=findDevices(0)      %searches for any device of the Tausand Abacus family
 %my_abacus=openAbacus('COM28'); %change COM port depending on your results of 'findDevices'
 my_abacus=openAbacus(my_ports{1}); %connects to the first found port
+
+%countersIdQuery(my_abacus)
+
 configureByName(my_abacus,["sampling"],[2500]) %sets sampling to 2.5s
 configureChannel(my_abacus,'B',20,50) %sets delay to 20ns and sleep to 50ns, or the closest valid values
 configureChannel(my_abacus,'a',10,59) %sets delay to 10ns and sleep to 59ns, or the closest valid values
@@ -36,3 +39,4 @@ timeLeftQuery(my_abacus)
 waitForAcquisitionComplete(my_abacus,10)
 configureSamplingTime(my_abacus,5000)
 waitForAcquisitionComplete(my_abacus,10)
+closeAbacus(my_abacus)

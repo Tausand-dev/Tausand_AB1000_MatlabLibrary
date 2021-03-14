@@ -7,7 +7,7 @@ function waitForBytes(abacus_object,expectedBytes,timeout)
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
 % May 2019; Last revision: 31-May-2019
-
+    tic
     while (abacus_object.BytesAvailable < expectedBytes) && (toc < timeout)
         %waits until all bytes are available or a timeout happens
     end

@@ -9,7 +9,7 @@ function [ resolution_ns ] = getResolutionFromName( abacus_object )
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% July 2020; Last update: 7-Jul-2020
+% July 2020; Last update: 11-Mar-2021
 
     serial_name = get(abacus_object,'Name');
     if contains(serial_name,"AB10")
@@ -19,7 +19,7 @@ function [ resolution_ns ] = getResolutionFromName( abacus_object )
     elseif contains(serial_name,"AB19")
         resolution_ns=1;
     else
-        disp('not a valid device. Resolution set to 5ns (default)')
+        warning('Not a valid device. Resolution set to 5ns (default).')
         resolution_ns=5;
     end
 

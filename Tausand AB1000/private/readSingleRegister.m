@@ -8,13 +8,13 @@ function [ data_out ] = readSingleRegister( abacus_object, address )
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last revision: 11-Mar-2021
+% May 2019; Last revision: 14-Mar-2021
 % v1.1 July 2020. Includes AB1502, AB1504, AB1902, AB1904 as valid device
 % types.
 %      March 2021. Returns unsigned integer.
 
-tStartRead = tic;
-maxtimeout = 0.5;   %500ms
+tStartSingleRead = tic;
+maxtimeout = 0.25;   %250ms
 data_out = -1;
 
 %some constants
@@ -27,7 +27,7 @@ C2Pow24=16777216;   %2^24
 
 %% Read request and wait for data available in port
 
-numtries = 4;
+numtries = 5;
 localmaxtimeout = maxtimeout/numtries;
 if is32bitdevice %if device_type == 1004, 1504 or 1904
     expectedBytes = 8;
@@ -48,16 +48,20 @@ while repeatRdWr == 1
         end
 
         waitForBytes(abacus_object,expectedBytes,localmaxtimeout);
-        tElapsedRead = toc(tStartRead);
-        if (tElapsedRead > maxtimeout)
+        tElapsedSingleRead = toc(tStartSingleRead);
+        if (abacus_object.BytesAvailable >= expectedBytes)
+            repeatWr=0; %done ok
+        elseif (tElapsedSingleRead > maxtimeout)
             repeatWr=0;   %disp('Too many retries. Timeout error.')
-        elseif (tElapsedRead > localmaxtimeout)
+        elseif (tElapsedSingleRead > localmaxtimeout)
             repeatWr=1;   %disp('Automatic retry')
+            %v1.1 2021-03-14 Updated localmaxtimeout: add to tElapsed
+            localmaxtimeout = tElapsedSingleRead + (maxtimeout/numtries);
         else
             repeatWr=0;
         end
-
-        localmaxtimeout = localmaxtimeout + (maxtimeout/numtries);
+%       %old version 1.0
+%       %localmaxtimeout = localmaxtimeout + (maxtimeout/numtries);
 
     end
 
@@ -66,14 +70,14 @@ while repeatRdWr == 1
     readDatastream=[];
     cumNumBytes = 0;
     
-    tElapsedRead = toc(tStartRead);
-    if tElapsedRead > maxtimeout
-        warning('Timeout in readSingleRegister.')
+    tElapsedSingleRead = toc(tStartSingleRead);
+    if tElapsedSingleRead > maxtimeout
+        warning('TAUSAND:timeout','Timeout in readSingleRegister.')
         return
     end    
     firstByte=fread(abacus_object,1);
     if isempty(firstByte)
-        warning('Timeout in readSingleRegister.')
+        warning('TAUSAND:timeout','Timeout in readSingleRegister.')
         return
     elseif firstByte ~= 126 %if first byte is not x"7E", quit
         %v1.1: scan for available bytes until x"7E" is found
@@ -89,17 +93,17 @@ while repeatRdWr == 1
     end
     numBytes=fread(abacus_object,1); %2nd byte says number of bytes that follows
     if isempty(numBytes)
-        warning('Timeout in readSingleRegister.')
+        warning('TAUSAND:timeout','Timeout in readSingleRegister.')
         return
     end
     thisReadDatastream=fread(abacus_object,numBytes); %read N bytes
     if isempty(thisReadDatastream)
-        warning('Timeout in readSingleRegister.')
+        warning('TAUSAND:timeout','Timeout in readSingleRegister.')
         return
     end
     checksum=fread(abacus_object,1); %read checksum byte
     if isempty(checksum)
-        warning('Timeout in readSingleRegister.')
+        warning('TAUSAND:timeout','Timeout in readSingleRegister.')
         return
     end
 
@@ -136,13 +140,13 @@ while repeatRdWr == 1
     
     data_out = uint32(data_out);    %2021-03: returns unsigned integer
 
-    tElapsedRead = toc(tStartRead);
+    tElapsedSingleRead = toc(tStartSingleRead);
     if addresses_ok
         repeatRdWr = 0; %do not repeat; done
-    elseif tElapsedRead < maxtimeout
+    elseif tElapsedSingleRead < maxtimeout
         repeatRdWr = 1; %do repeat, if there is time to do it
     else
-        warning('Timeout in readSingleRegister.');
+        warning('TAUSAND:timeout','Timeout in readSingleRegister.');
         return
     end
 end

@@ -17,5 +17,6 @@ function clearBuffer(abacus_object)
 
     %v1.1
     flushinput(abacus_object);%flushes any remaining data in input buffer
-    flushoutput(abacus_object);%flushes any remaining data in output buffer
+    flushoutput(abacus_object);%flushes any remaining data in output buffer    
+
 end

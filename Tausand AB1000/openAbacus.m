@@ -16,6 +16,8 @@ function [ abacus_obj ] = openAbacus( port )
 %
 %     % To disconnect the object from the serial port:
 %       closeAbacus(abacus_obj);
+%
+%   See also CLOSEABACUS.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

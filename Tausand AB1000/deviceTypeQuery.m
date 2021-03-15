@@ -16,6 +16,8 @@ function [ device_type ] = deviceTypeQuery( abacus_object )
 %
 %     % To disconnect the object from the serial port:
 %       closeAbacus(abacus_obj);
+%
+%   See also FINDDEVICES, IDNQUERY.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

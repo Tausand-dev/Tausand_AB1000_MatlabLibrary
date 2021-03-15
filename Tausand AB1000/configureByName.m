@@ -23,6 +23,8 @@ function [ ] = configureByName( abacus_object, labels_strings, values )
 %
 %     % To disconnect the object from the serial port:
 %       closeAbacus(abacus_obj);
+%
+%   See also CONFIGURECHANNEL, QUERYALLSETTINGS.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

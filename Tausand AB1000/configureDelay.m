@@ -15,6 +15,8 @@ function [ value_ns ] = configureDelay( abacus_object, channel_char, value_ns )
 %
 %     % To disconnect the object from the serial port:
 %       closeAbacus(abacus_obj);
+%
+%   See also CONFIGURECHANNEL, QUERYDELAY.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

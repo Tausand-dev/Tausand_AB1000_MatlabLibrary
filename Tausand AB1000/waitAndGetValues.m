@@ -46,6 +46,7 @@ function [ data_out, labels_out ] = waitAndGetValues( abacus_object, channels, p
 %     % To disconnect the object from the serial port:
 %       closeAbacus(abacus_obj);
 %
+%   See also READMEASUREMENT, WAITFORACQUISITIONCOMPLETE.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

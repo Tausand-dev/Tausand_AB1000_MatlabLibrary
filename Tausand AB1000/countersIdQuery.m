@@ -28,6 +28,8 @@ function [ id ] = countersIdQuery( abacus_object )
 %
 %     % To disconnect the object from the serial port:
 %       closeAbacus(abacus_obj);
+%
+%   See also TIMELEFTQUERY.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

@@ -47,6 +47,8 @@ function [ config_string, config_value ] = queryMultipleCoincidence( abacus_obje
 %
 %   This function does not work on devices with less than 4 input channels,
 %   e.g. AB1002, AB1502, AB1902.
+%
+%   See also CONFIGUREMULTIPLECOINCIDENCE, READMEASUREMENT.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

@@ -30,6 +30,7 @@ function [ data_out, labels_out ] = readMeasurement( abacus_object )
 %     % To disconnect the object from the serial port:
 %       closeAbacus(abacus_obj);
 %
+%   See also QUERYALLSETTINGS, WAITANDGETVALUES.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

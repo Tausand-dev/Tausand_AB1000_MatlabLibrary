@@ -19,6 +19,8 @@ function [ time_left_ms ] = timeLeftQuery( abacus_object )
 %
 %     % To disconnect the object from the serial port:
 %       closeAbacus(abacus_obj);
+%
+%   See also COUNTERSIDQUERY.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

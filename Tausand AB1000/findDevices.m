@@ -34,6 +34,8 @@ function [ ports, count ] = findDevices( device_type )
 %
 %     % Scan and find serial ports with Tausand Abacus AB1504 devices:
 %       [my_ports_1504, num_ports_1504] = findDevices(1504);
+%
+%   See also CLOSEABACUS, DEVICETYPEQUERY, IDNQUERY, OPENABACUS.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

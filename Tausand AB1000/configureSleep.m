@@ -19,6 +19,8 @@ function [ value_ns ] = configureSleep( abacus_object, channel_char, value_ns )
 %
 %     % To disconnect the object from the serial port:
 %       closeAbacus(abacus_obj);
+%
+%   See also CONFIGURECHANNEL, QUERYSLEEP.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

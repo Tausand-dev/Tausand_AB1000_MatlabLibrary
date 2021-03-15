@@ -34,6 +34,9 @@ function [ ] = waitForAcquisitionComplete( abacus_object, print_on, maxwait_s, m
 %
 %     % To disconnect the object from the serial port:
 %       closeAbacus(abacus_obj);
+%
+%   See also COUNTERSIDQUERY, READMEASUREMENT, TIMELEFTQUERY,
+%   WAITANDGETVALUES.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

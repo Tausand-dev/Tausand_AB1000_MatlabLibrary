@@ -14,13 +14,21 @@
 
 
 %% Constants to be defined by user
-samples_to_read = 10; %change this parameter to set how many samples to read
-my_sampling_time_ms = 1000; %change this parameter to set your sampling time. 1000=1s.
-my_port = 'COM23'; %change this port to the adequate one
+% Change this parameter to set how many samples to read:
+samples_to_read = 10; 
+%%
+% Change this parameter to set your sampling time. 1000=1s:
+my_sampling_time_ms = 1000; 
+%%
+% Change this port to the adequate one:
+my_port = 'COM23'; 
 
 %%
 % Define the desired channels to be read. Example:
-channels_to_read = ["A","B","C","AB","AC","multiple_1"]; %multiple_1 corresponds to a multi-fold mesurement, to be configured, e.g. 'ABC'
+channels_to_read = ["A","B","C","AB","AC","multiple_1"]; 
+%%
+% where string "multiple_1" corresponds to a multi-fold measurement, to be 
+% configured, e.g. 'ABC'
 
 %% Establish a connection
 disp("******************************");

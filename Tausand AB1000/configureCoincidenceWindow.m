@@ -14,6 +14,8 @@ function [ value_ns ] = configureCoincidenceWindow( abacus_object, value_ns )
 %
 %     % To disconnect the object from the serial port:
 %       closeAbacus(abacus_obj);
+%
+%   See also QUERYCOINCIDENCEWINDOW.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

@@ -17,6 +17,8 @@ function [ value_ms ] = querySamplingTime( abacus_object )
 %
 %     % To disconnect the object from the serial port:
 %       closeAbacus(abacus_obj);
+%
+%   See also CONFIGURESAMPLINGTIME.
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

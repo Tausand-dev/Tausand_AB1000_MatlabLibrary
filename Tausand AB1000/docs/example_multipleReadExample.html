@@ -6,7 +6,7 @@
    <!--
 This HTML was auto-generated from MATLAB code.
 To make changes, update the MATLAB code and republish this document.
-      --><title>Tausand AB1000 library example: Multiple Read Example</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-03-15"><meta name="DC.source" content="example_multipleReadExample.m"><style type="text/css">
+      --><title>Tausand AB1000 Matlab library example: Multiple Read Example</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-03-15"><meta name="DC.source" content="example_multipleReadExample.m"><style type="text/css">
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
 
 html { min-height:100%; margin-bottom:1px; }
@@ -66,11 +66,11 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Tausand AB1000 library example: Multiple Read Example</h1><!--introduction--><p>Reads continously and saves data from a Tausand Abacus coincidence counter. Uses functions in the Tausand_AB1000_MatlabLibrary. Handles errors and retry readings and connections when lost. To be used in Matlab's command window.</p><p>Author: David Guzman. Tausand Electronics, Colombia. March 2021; Last update: 15-Mar-2021.</p><p>Contact email: <a href="mailto:dguzman@tausand.com">dguzman@tausand.com</a>. Website: <a href="http://www.tausand.com">http://www.tausand.com</a></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Constants to be defined by user</a></li><li><a href="#3">Establish a connection</a></li><li><a href="#4">Write and read new settings</a></li><li><a href="#9">Create plaintext file</a></li><li><a href="#12">Multiple read using function waitAndGetValues</a></li><li><a href="#13">Close connection and close file</a></li></ul></div><h2 id="1">Constants to be defined by user</h2><pre class="codeinput">samples_to_read = 10; <span class="comment">%change this parameter to set how many samples to read</span>
-my_sampling_time_ms = 1000; <span class="comment">%change this parameter to set your sampling time. 1000=1s.</span>
-my_port = <span class="string">'COM23'</span>; <span class="comment">%change this port to the adequate one</span>
-</pre><p>Define the desired channels to be read. Example:</p><pre class="codeinput">channels_to_read = [<span class="string">"A"</span>,<span class="string">"B"</span>,<span class="string">"C"</span>,<span class="string">"AB"</span>,<span class="string">"AC"</span>,<span class="string">"multiple_1"</span>]; <span class="comment">%multiple_1 corresponds to a multi-fold mesurement, to be configured, e.g. 'ABC'</span>
-</pre><h2 id="3">Establish a connection</h2><pre class="codeinput">disp(<span class="string">"******************************"</span>);
+  </style></head><body><div class="content"><h1>Tausand AB1000 Matlab library example: Multiple Read Example</h1><!--introduction--><p>Reads continously and saves data from a Tausand Abacus coincidence counter. Uses functions in the Tausand_AB1000_MatlabLibrary. Handles errors and retry readings and connections when lost. To be used in Matlab's command window.</p><p>Author: David Guzman. Tausand Electronics, Colombia. March 2021; Last update: 15-Mar-2021.</p><p>Contact email: <a href="mailto:dguzman@tausand.com">dguzman@tausand.com</a>. Website: <a href="http://www.tausand.com">http://www.tausand.com</a></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Constants to be defined by user</a></li><li><a href="#6">Establish a connection</a></li><li><a href="#7">Write and read new settings</a></li><li><a href="#12">Create plaintext file</a></li><li><a href="#15">Multiple read using function waitAndGetValues</a></li><li><a href="#16">Close connection and close file</a></li></ul></div><h2 id="1">Constants to be defined by user</h2><p>Change this parameter to set how many samples to read:</p><pre class="codeinput">samples_to_read = 10;
+</pre><p>Change this parameter to set your sampling time. 1000=1s:</p><pre class="codeinput">my_sampling_time_ms = 1000;
+</pre><p>Change this port to the adequate one:</p><pre class="codeinput">my_port = <span class="string">'COM23'</span>;
+</pre><p>Define the desired channels to be read. Example:</p><pre class="codeinput">channels_to_read = [<span class="string">"A"</span>,<span class="string">"B"</span>,<span class="string">"C"</span>,<span class="string">"AB"</span>,<span class="string">"AC"</span>,<span class="string">"multiple_1"</span>];
+</pre><p>where string "multiple_1" corresponds to a multi-fold mesurement, to be configured, e.g. 'ABC'</p><h2 id="6">Establish a connection</h2><pre class="codeinput">disp(<span class="string">"******************************"</span>);
 disp(<span class="string">"MATLAB multiple read example"</span>);
 disp(<span class="string">"******************************"</span>);
 disp(<span class="string">"1. Establish a connection"</span>);
@@ -105,7 +105,7 @@ device_idn =
 
     'Tausand Abacus AB1504'
 
-</pre><h2 id="4">Write and read new settings</h2><pre class="codeinput">disp(<span class="string">"2. Write and read new settings"</span>);
+</pre><h2 id="7">Write and read new settings</h2><pre class="codeinput">disp(<span class="string">"2. Write and read new settings"</span>);
 </pre><pre class="codeoutput">2. Write and read new settings
 </pre><p>Write settings, using configureByName function:</p><pre class="codeinput">configureByName(my_abacus,<span class="string">"sampling"</span>,my_sampling_time_ms);
 </pre><p>Several configurations may be applied with a single command line:</p><pre class="codeinput">configureByName(my_abacus,<span class="keyword">...</span>
@@ -152,22 +152,22 @@ warning(my_warn.state, <span class="string">'TAUSAND:timeout'</span>); <span cla
     "coincidence_window"    "50"  
     "delay_A"               "0"   
     "delay_B"               "10"  
-    "delay_C"               "0"   
+    "delay_C"               "36"  
     "delay_D"               "0"   
     "sleep_A"               "0"   
     "sleep_B"               "20"  
     "sleep_C"               "0"   
     "sleep_D"               "0"   
-    "config_multiple_1"     "240" 
+    "config_multiple_1"     "208" 
 
-</pre><h2 id="9">Create plaintext file</h2><pre class="codeinput">disp(<span class="string">"3. Create file"</span>);
+</pre><h2 id="12">Create plaintext file</h2><pre class="codeinput">disp(<span class="string">"3. Create file"</span>);
 date_time_string = string(datetime,<span class="string">'yyyy-MM-dd_HHmmss'</span>);
 column_headers = cat(2,[<span class="string">"PC time"</span>,<span class="string">"countersID"</span>],channels_to_read);
 file_name = strcat(<span class="string">'data_multipleReadExample_'</span>,date_time_string,<span class="string">'.txt'</span>);
 </pre><pre class="codeoutput">3. Create file
 </pre><p>Create file,</p><pre class="codeinput">myfile = fopen(file_name, <span class="string">'a'</span>); <span class="comment">%create file in append mode</span>
 disp(strcat(<span class="string">"File "</span>,file_name,<span class="string">" has been created"</span>));
-</pre><pre class="codeoutput">File data_multipleReadExample_2021-03-15_154832.txt has been created
+</pre><pre class="codeoutput">File data_multipleReadExample_2021-03-15_161419.txt has been created
 </pre><p>and write file headers,</p><pre class="codeinput">fwrite(myfile,[<span class="string">'multipleReadExample'</span>,newline]);
 fwrite(myfile,[<span class="string">'-------------------'</span>,newline]);
 fwrite(myfile,[<span class="string">'Begin time: '</span>,char(date_time_string),newline]);
@@ -177,7 +177,7 @@ fprintf(myfile,<span class="string">'%s\t%s\n'</span>,[setting_labels,num2str(se
 fwrite(myfile,[newline,newline]);
 fprintf(myfile,<span class="string">'%s\t'</span>,column_headers);
 fwrite(myfile,newline);
-</pre><h2 id="12">Multiple read using function waitAndGetValues</h2><pre class="codeinput">disp(<span class="string">'4. Multiple read using waitAndGetValues function begins'</span>);
+</pre><h2 id="15">Multiple read using function waitAndGetValues</h2><pre class="codeinput">disp(<span class="string">'4. Multiple read using waitAndGetValues function begins'</span>);
 fprintf(<span class="string">'\t%s'</span>,column_headers); <span class="comment">%print in command window</span>
 fprintf(<span class="string">'\n'</span>);
 tMultipleReadExample = tic;
@@ -212,21 +212,21 @@ tMultipleReadExample = tic;
 <span class="keyword">end</span>
 </pre><pre class="codeoutput">4. Multiple read using waitAndGetValues function begins
 	PC time	countersID	A	B	C	AB	AC	multiple_1
-1/10	0.273	1823	15624	31249	31249	15624	15624	1736
-2/10	1.433	1824	15625	31250	31250	15625	15625	1736
-3/10	2.232	1825	15625	31249	31249	15625	15625	1737
-4/10	3.226	1826	15624	31249	31249	15624	15624	1736
-5/10	4.274	1827	15625	31250	31250	15625	15625	1736
-6/10	5.235	1828	15625	31249	31249	15625	15625	1736
-7/10	6.209	1829	15624	31249	31249	15624	15624	1736
-8/10	7.268	1830	15625	31249	31249	15625	15625	1736
-9/10	8.199	1831	15625	31250	31250	15625	15625	1736
-10/10	9.250	1832	15624	31249	31249	15624	15624	1736
-</pre><h2 id="13">Close connection and close file</h2><pre class="codeinput">fclose(myfile);
+1/10	0.654	131	15625	31249	31249	15625	15625	1736
+2/10	1.662	132	15624	31249	31249	15624	15624	1736
+3/10	2.647	133	15625	31250	31250	15625	15625	1736
+4/10	3.814	134	15625	31249	31249	15625	15625	1736
+5/10	4.720	135	15624	31249	31249	15624	15624	1736
+6/10	5.861	136	15625	31250	31250	15625	15625	1737
+7/10	6.692	137	15625	31249	31249	15625	15625	1736
+8/10	7.720	138	15625	31250	31250	15625	15625	1736
+9/10	8.686	139	15624	31249	31249	15624	15624	1736
+10/10	9.705	140	15625	31249	31249	15625	15625	1736
+</pre><h2 id="16">Close connection and close file</h2><pre class="codeinput">fclose(myfile);
 closeAbacus(my_abacus)
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
 ##### SOURCE BEGIN #####
-%% Tausand AB1000 library example: Multiple Read Example
+%% Tausand AB1000 Matlab library example: Multiple Read Example
 % Reads continously and saves data from a Tausand Abacus coincidence 
 % counter. Uses functions in the Tausand_AB1000_MatlabLibrary. Handles 
 % errors and retry readings and connections when lost. To be used in 
@@ -242,13 +242,21 @@ closeAbacus(my_abacus)
 
 
 %% Constants to be defined by user
-samples_to_read = 10; %change this parameter to set how many samples to read
-my_sampling_time_ms = 1000; %change this parameter to set your sampling time. 1000=1s.
-my_port = 'COM23'; %change this port to the adequate one
+% Change this parameter to set how many samples to read:
+samples_to_read = 10; 
+%%
+% Change this parameter to set your sampling time. 1000=1s:
+my_sampling_time_ms = 1000; 
+%%
+% Change this port to the adequate one:
+my_port = 'COM23'; 
 
 %%
 % Define the desired channels to be read. Example:
-channels_to_read = ["A","B","C","AB","AC","multiple_1"]; %multiple_1 corresponds to a multi-fold mesurement, to be configured, e.g. 'ABC'
+channels_to_read = ["A","B","C","AB","AC","multiple_1"]; 
+%%
+% where string "multiple_1" corresponds to a multi-fold mesurement, to be 
+% configured, e.g. 'ABC'
 
 %% Establish a connection
 disp("******************************");

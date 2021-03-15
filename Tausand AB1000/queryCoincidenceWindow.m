@@ -1,12 +1,28 @@
 function [ value_ns ] = queryCoincidenceWindow( abacus_object )
 %QUERYCOINCIDENCEWINDOW Reads the coincidence window, in ns, from a Tausand Abacus.
-%   Detailed explanation goes here
+%   Y = queryCoincidenceWindow(OBJ) reads the current configuration of the
+%   coincidence window on the Tausand Abacus device connected to serial 
+%   port object OBJ. Returns Y as the actual value of coincidence window, 
+%   in nanoseconds.
+%
+%   Example:
+%     % To create and connect to a Tausand Abacus device:
+%       abacus_obj = openAbacus('COM3');
+%
+%     % To assign coincidence window = 300ns:
+%       configureCoincidenceWindow(abacus_obj,300);
+%
+%     % To read current coincidence window:
+%       my_coinc_wind_ns = queryCoincidenceWindow(abacus_obj);
+%
+%     % To disconnect the object from the serial port:
+%       closeAbacus(abacus_obj);
 
 % Author: David Guzman
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 11-Mar-2021
+% May 2019; Last update: 15-Mar-2021
 % v1.1 August 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904.
 
 %% Input validation

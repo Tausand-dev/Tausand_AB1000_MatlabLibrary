@@ -1,19 +1,51 @@
 function [ data_out, labels_out ] = readMeasurement( abacus_object )
-%READMEASUREMENT Reads all counter values form a Tausand Abacus.
-%     Returns two equally sized arrays: 'data_out' and 'labels_out'. Possible 'labels' are: 
-%     "counter_X": counts in single channel X
-%     "counter_XY": coincidence counts between channels X and Y
-%     "counter_multiple_X": multi-fold coincidences as configured by user in counter X
-%     "counters_ID": consecutive identifier for a measurement. When configuration changes, resets to 0.
-%     "time_left": miliseconds remaining for the next data to be available.
+%READMEASUREMENT Reads all counter and coincidence values form a Tausand Abacus.
+%   [V,S] = readMeasurement(OBJ) reads a full set of current measurements,
+%   including single and coincidence counters, within the the Tausand 
+%   Abacus device connected to serial port object OBJ. Returns two equally 
+%   sized arrays, V with integer values, and S with their corresponding 
+%   counter label strings.
+%
+%   Possible 'labels' in array S are:
+%     "counter_I":  counts in single channel I
+%     "counter_IJ": coincidence counts between channels I and J
+%     "counter_multiple_K": multi-fold coincidences as configured by user 
+%                           in counter K
+%     "counters_ID": consecutive identifier for a measurement. When 
+%                    configuration changes, resets to 0. This value may
+%                    overflow at 1 million.
+%     "time_left": remaining time, in milliseconds, for the next data to be 
+%                  available.
+%
+%   Example:
+%     % To create and connect to a Tausand Abacus device:
+%       abacus_obj = openAbacus('COM3');
+%
+%     % Wait to a new data set to be avaiable to read (not required):
+%       waitForAcquisitionComplete(abacus_obj);
+%
+%     % Read a full set of current data in the device:
+%       [data,labels] = readMeasurement(abacus_obj);
+%
+%     % To disconnect the object from the serial port:
+%       closeAbacus(abacus_obj);
+%
 
 % Author: David Guzman
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 11-Mar-2021
-% v1.1 September 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904. Tested on AB1504.
+% May 2019; Last update: 15-Mar-2021
+% v1.1 September 2020. Includes new devices AB1502, AB1504, AB1902 and 
+%      AB1904. Tested on AB1504.
 %      March 2021. Returns integer (uint32) values.
+
+% Some timing measurements:
+%   In a AB1504, to read the set of 83 bytes, the timer tElapsed = 0.035s
+%   in a Windows PC.
+%   Waiting for 0.04s would be enough to receive all data.
+%       maxtimeout: 0.32
+%       numtries:   8
 
 %% Input validation
 if ~isa(abacus_object,'serial')
@@ -22,11 +54,14 @@ if ~isa(abacus_object,'serial')
     error(errorStruct) 
 end
 
-tStartLocal = tic;
+tStartLocalReadMeasurement = tic;
 data_out = [];
 labels_out = [];
-maxtimeout = 0.5;    %500ms: timeout for the whole routine
+maxtimeout = 0.32;    %320ms: timeout for the whole routine
 buffertimeout = 0.05; %50ms: timeout for a single input buffer read
+numtries = 8;
+localmaxtimeout = maxtimeout/numtries;  %about 320/8=40ms
+singlereadtimeout = maxtimeout/numtries;%about 320/8=40ms
 
 %some constants
 C2Pow8=256;         %2^8
@@ -52,8 +87,7 @@ C2Pow24=16777216;   %2^24
 
 %% Read request and wait for data available in port
 
-numtries = 4;
-localmaxtimeout = maxtimeout/numtries;
+
 if is32bitdevice %if device_type == 1004, 1504 or 1904
     expectedBytes = 83;
 else%if device_type == 1002, 1502 or 1902
@@ -75,7 +109,6 @@ while repeatRdWr == 1
     repeatWr = 1;
     while repeatWr == 1
         clearBuffer(abacus_object); % clear buffer
-        
         if is32bitdevice %if device_type == 1004, 1504 or 1904
             for k=av
                 writeSerial32(abacus_object,'read',k(1),k(2)); % send 6 commands to Abacus
@@ -92,17 +125,25 @@ while repeatRdWr == 1
 %             end
 %         end
 
-        waitForBytes(abacus_object,expectedBytes,localmaxtimeout);
-        tElapsedLocal = toc(tStartLocal);
-        if (tElapsedLocal > maxtimeout)
+        %waitForBytes(abacus_object,expectedBytes,localmaxtimeout);
+        waitForBytes(abacus_object,expectedBytes,singlereadtimeout); %v1.1 always wait up to singlereadtimeout
+        
+        tElapsedLocalReadMeasurement = toc(tStartLocalReadMeasurement);
+        if (abacus_object.BytesAvailable >= expectedBytes)
+            repeatWr=0; %done ok
+        elseif (tElapsedLocalReadMeasurement > maxtimeout)
             repeatWr=0;   %disp('Too many retries. Timeout error.')
-        elseif (tElapsedLocal > localmaxtimeout)
+        elseif (tElapsedLocalReadMeasurement > localmaxtimeout)
             repeatWr=1;   %disp('Automatic retry')
+            singlereadtimeout = singlereadtimeout*1.2; %v1.1 Increase 20% singleread timeout
+            %v1.1 2021-03-14 Updated localmaxtimeout: add to tElapsed
+            localmaxtimeout = tElapsedLocalReadMeasurement + singlereadtimeout;
         else
             repeatWr=0;
         end
 
-        localmaxtimeout = localmaxtimeout + (maxtimeout/numtries);
+%       % %old version 1.0
+%       %localmaxtimeout = localmaxtimeout + (maxtimeout/numtries);
 
     end
 
@@ -123,15 +164,15 @@ while repeatRdWr == 1
 %         numReads=6;
 %     end
 
+    
     for i=1:numReads
-        tElapsedLocal = toc(tStartLocal);
-        if tElapsedLocal > maxtimeout
+        tElapsedLocalReadMeasurement = toc(tStartLocalReadMeasurement);
+        if tElapsedLocalReadMeasurement > maxtimeout
             warning('TAUSAND:timeout','Timeout in function readMeasurement.')
             return
         end 
         %numReads %testing
         %i %testing
-        %firstByte=fread(abacus_object,1);
         bytesavail = abacus_object.BytesAvailable;
         tByteStart = tic;
         tByteEnd = 0;
@@ -141,15 +182,23 @@ while repeatRdWr == 1
         end
         if bytesavail >= 2
             %if there are 2 bytes in buffer, read them
-            %[firstByte,count,msg]=fread(abacus_object,1);
             firstByte=fread(abacus_object,1);
-            if firstByte ~= 126 %if first byte is not x"7E", quit
-                errorStruct.message = 'Expected first byte is not correct. Read cancelled.';
-                errorStruct.identifier = 'TAUSAND:unexpectedReadByte';
-                error(errorStruct) 
-                %error('Expected first byte is not correct. Read cancelled.');
-                %return
-            end
+            
+            if isempty(firstByte)
+                warning('TAUSAND:timeout','Timeout in readMeasurement.')
+                return
+            elseif firstByte ~= 126 %if first byte is not x"7E", quit
+                %v1.1: scan for available bytes until x"7E" is found
+                while (abacus_object.BytesAvailable>0) && (firstByte ~= 126)
+                    firstByte=fread(abacus_object,1);
+                end
+                if firstByte ~= 126 %not found within available bytes
+                    errorStruct.message = 'Expected first byte is not correct. Read cancelled.';
+                    errorStruct.identifier = 'TAUSAND:unexpectedReadByte';
+                    error(errorStruct) 
+                    %return
+                end
+            end            
             numBytes=fread(abacus_object,1); %2nd byte says number of bytes that follows
         else
             firstByte=0;
@@ -166,13 +215,11 @@ while repeatRdWr == 1
             end
             if bytesavail >= numBytes
                 thisReadDatastream=fread(abacus_object,numBytes); %read N bytes
-                %thisReadDatastream %testing
                 checksum=fread(abacus_object,1); %read checksum byte
 
                 %checksum verification
                 ver=uint8(sum(thisReadDatastream)+checksum);
                 if ver ~= 255
-                    %error('Checksum failed. Read cancelled.')
                     errorStruct.message = 'Checksum failed. Read cancelled.';
                     errorStruct.identifier = 'TAUSAND:checksumFailed';
                     error(errorStruct) 
@@ -181,7 +228,6 @@ while repeatRdWr == 1
                 readDatastream=[readDatastream;thisReadDatastream];
                 cumNumBytes = cumNumBytes + numBytes;
             else %no valid bytes in port
-                %error('Missing data. Read cancelled.')
                 errorStruct.message = 'Missing data. Read cancelled.';
                 errorStruct.identifier = 'TAUSAND:missingReadData';
                 error(errorStruct)
@@ -236,10 +282,10 @@ while repeatRdWr == 1
 %     end
     %toc
 
-    tElapsedLocal = toc(tStartLocal);
+    tElapsedLocalReadMeasurement = toc(tStartLocalReadMeasurement);
     if addresses_ok
         repeatRdWr = 0; %do not repeat; done
-    elseif tElapsedLocal < maxtimeout
+    elseif tElapsedLocalReadMeasurement < maxtimeout
         repeatRdWr = 1; %do repeat, if there is time to do it
     else
         warning('TAUSAND:timeout','Timeout in function readMeasurement.')

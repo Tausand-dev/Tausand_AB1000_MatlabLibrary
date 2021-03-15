@@ -1,13 +1,25 @@
 function [ value_ns ] = configureCoincidenceWindow( abacus_object, value_ns )
 %CONFIGURECOINCIDENCEWINDOW Writes the coincidence window in a Tausand Abacus.
-%   Value in nanoseconds.
-%   Applies data validation before writting by coercing values if required.
+%   Y = configureCoincidenceWindow(OBJ,X) changes the configuration of the
+%   coincidence window to X nanoseconds on the Tausand Abacus device 
+%   connected to serial port object OBJ. Returns Y as the actual new value 
+%   of coincidence window, in nanoseconds, after coercing input value.
+%
+%   Example:
+%     % To create and connect to a Tausand Abacus device:
+%       abacus_obj = openAbacus('COM3');
+%
+%     % To assign coincidence window = 300ns:
+%       configureCoincidenceWindow(abacus_obj,300);
+%
+%     % To disconnect the object from the serial port:
+%       closeAbacus(abacus_obj);
 
 % Author: David Guzman
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 10-Mar-2021
+% May 2019; Last update: 14-Mar-2021
 % v1.1 July 2020. Includes different resolutions, depending on each device.
 % Accepts AB1502, AB1504, AB1902, AB1904 as valid device types.
 

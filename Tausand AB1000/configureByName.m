@@ -1,15 +1,15 @@
 function [ ] = configureByName( abacus_object, labels_strings, values )
 %CONFIGUREBYNAME Configure Tausand Abacus by label and value pairs.
-%   configureByName(OBJ,S,V) changes the configuration of the serial port
-%   object OBJ device, by assigning the numerical integer values of array V 
-%   to the settings stated in the string array S.
+%   configureByName(OBJ,S,V) changes the configuration of the Tausand 
+%   Abacus device with serial port object OBJ, by assigning the numerical 
+%   integer values of array V to the settings stated in the string array S.
 %
-%   Valid 'labels' are:
+%   Valid 'labels' in array S are:
 %   "sampling": in ms
 %   "coincidence_window": in ns
-%   "delay_X": delay in ns in channel X
-%   "sleep_X": sleep time in ns in channel X
-%   "config_multiple_X": multi-fold coincidence configuration for counter X
+%   "delay_I": delay in ns in channel I
+%   "sleep_I": sleep time in ns in channel I
+%   "config_multiple_J": multi-fold coincidence configuration for counter J
 %
 %   Example:
 %     % To create and connect to a Tausand Abacus device:

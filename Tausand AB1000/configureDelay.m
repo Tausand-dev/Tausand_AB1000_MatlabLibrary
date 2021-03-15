@@ -1,14 +1,26 @@
 function [ value_ns ] = configureDelay( abacus_object, channel_char, value_ns )
 %CONFIGUREDELAY Writes a single delay in a Tausand Abacus.
-%   Channel must be specified as char ('A','B',...)
-%   Value in nanoseconds.
-%   Applies data validation before writting by coercing values if required.
+%   Y = configureDelay(OBJ,CHR,X) changes the delay configuration of the
+%   single channel specified in character CHR of the Tausand Abacus device 
+%   connected to serial port object OBJ. Assigns a delay of X nanoseconds. 
+%   Returns Y as the actual new value of delay in nanoseconds after 
+%   coercing input values.
+%
+%   Example:
+%     % To create and connect to a Tausand Abacus device:
+%       abacus_obj = openAbacus('COM3');
+%
+%     % To assign delay in B = 20ns:
+%       configureDelay(abacus_obj,'B',20);
+%
+%     % To disconnect the object from the serial port:
+%       closeAbacus(abacus_obj);
 
 % Author: David Guzman
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 10-Mar-2021
+% May 2019; Last update: 15-Mar-2021
 % v1.1 July 2020. Includes different resolutions, depending on each device.
 % Accepts AB1502, AB1504, AB1902, AB1904 as valid device types.
 
@@ -27,7 +39,7 @@ if isstring(channel_char)
     %if input is a string, convert to a char array
     channel_char = char(channel_char);
 end
-if length(channel_char)> 1
+if length(channel_char) ~= 1
     errorStruct.message = 'Input ''channel_char'' must be a single char.';
     errorStruct.identifier = 'TAUSAND:incorrectType';
     error(errorStruct)

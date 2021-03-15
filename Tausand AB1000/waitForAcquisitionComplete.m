@@ -1,10 +1,39 @@
-function [ ] = waitForAcquisitionComplete( abacus_object, maxwait_s, max_try )
+function [ ] = waitForAcquisitionComplete( abacus_object, print_on, maxwait_s, max_try )
 %WAITFORACQUISITIONCOMPLETE Waits for the current acquisition to finish.
-%   Waits until counters_ID changes in a Tausand Abacus. The maximum
-%   waiting time is specified on input maxwait_s.
-%   Optional arguments: 
-%       maxwait_s   Maximum time to wait. Default=10.
-%       max_try     Maximum trials of communication. Default=6.
+%   waitForAcquisitionComplete(OBJ,A,X,Y)   Waits until a new set of data
+%   becomes available on the Tausand Abacus device connected to serial port 
+%   object OBJ. This happens once the device counter 'counters_ID' changes.
+%   When optional logical input A is TRUE, this function prints information 
+%   messages in command window. Optional input X is a number indicating the 
+%   maximum time to wait, in seconds. Optional input Y is an integer number 
+%   indicating the maximum trials of communication within the function. 
+%   Default values are: A=false, X=10, Y=6.
+%
+%   waitForAcquisitionComplete(OBJ,A,X)   Uses max_try=6.
+%
+%   waitForAcquisitionComplete(OBJ,A)     Uses maxwait_s=10, max_try=6.
+%
+%   waitForAcquisitionComplete(OBJ)       Uses maxwait_s=10, max_try=6, 
+%                                         print_on=false.
+%
+%   Example:
+%     % To create and connect to a Tausand Abacus device:
+%       abacus_obj = openAbacus('COM3');
+%
+%     % Wait to a new data set to be avaiable to read:
+%       waitForAcquisitionComplete(abacus_obj);
+%
+%     % Read a full set of current data in the device:
+%       [data,labels] = readMeasurement(abacus_obj);
+%
+%     % Wait printing information messages:
+%       waitForAcquisitionComplete(abacus_obj,true);
+%
+%     % Wait without printing information messages, up to 5 seconds:
+%       waitForAcquisitionComplete(abacus_obj,false,5);
+%
+%     % To disconnect the object from the serial port:
+%       closeAbacus(abacus_obj);
 
 % Author: David Guzman
 % Tausand Electronics, Colombia
@@ -30,6 +59,16 @@ function [ ] = waitForAcquisitionComplete( abacus_object, maxwait_s, max_try )
     %% Step 1: validate optional arguments
     
     if (nargin<2) %new v1.1
+        %if print_on is not given
+        print_on = false;   %set default value: off
+    else
+        if ~islogical(print_on)
+            errorStruct.message = 'Input ''print_on'' must be a logical value: true, false.';
+            errorStruct.identifier = 'TAUSAND:incorrectType';
+            error(errorStruct)
+        end
+    end
+    if (nargin<3) %new v1.1
         %if maxwait_s is not given
         maxwait_s=10;   %set default value: 10 seconds
     else
@@ -46,7 +85,7 @@ function [ ] = waitForAcquisitionComplete( abacus_object, maxwait_s, max_try )
         end
     end
     
-    if (nargin<3) %new v1.1
+    if (nargin<4) %new v1.1
         %if max_try is not given
         max_try=6;   %set default value: 6.
     else
@@ -75,10 +114,13 @@ function [ ] = waitForAcquisitionComplete( abacus_object, maxwait_s, max_try )
     if wasTimeoutWarningOn
         warning('off','TAUSAND:timeout');   %turn off timeout warnings. If so, a retry will be done anyway.
     end
-    for (attempt=1:max_try)
+    for attempt=1:max_try
         try
             initialId = countersIdQuery(abacus_object);
-            fprintf("Current ID is %d\n",initialId);
+            if print_on
+                %only print in command window when print_on==true
+                fprintf("Current ID is %d\n",initialId);
+            end
             break;  %force end for loop            
         catch ME
             switch ME.identifier
@@ -104,18 +146,24 @@ function [ ] = waitForAcquisitionComplete( abacus_object, maxwait_s, max_try )
     %% Steps 3,4,5: get time to wait, wait, and read new ID.
     
     waiting = true;
-    fprintf("Next data is available in       ");
+    if print_on
+        %only print in command window when print_on==true
+        fprintf("Next data is available in       ");
+    end
     while waiting
         
         %Step 3: get time to wait
         if wasTimeoutWarningOn
             warning('off','TAUSAND:timeout');   %turn off timeout warnings. If so, a retry will be done anyway.
         end
-        for (attempt=1:max_try)
+        for attempt=1:max_try
             try
                 timeLeft_ms = timeLeftQuery(abacus_object);
-                fprintf("\b\b\b\b\b\b\b",timeLeft_ms/1000);
-                fprintf("%6.1fs",timeLeft_ms/1000);
+                if print_on
+                    %only print in command window when print_on==true
+                    fprintf("\b\b\b\b\b\b\b");
+                    fprintf("%6.1fs",double(timeLeft_ms)/1000);
+                end
                 break;  %force end for loop            
             catch ME
                 %disp(ME.identifier)
@@ -146,7 +194,7 @@ function [ ] = waitForAcquisitionComplete( abacus_object, maxwait_s, max_try )
         if wasTimeoutWarningOn
             warning('off','TAUSAND:timeout');   %turn off timeout warnings. If so, a retry will be done anyway.
         end
-        for (attempt=1:max_try)
+        for attempt=1:max_try
             try
                 currentId = countersIdQuery(abacus_object);
                 break;  %force end for loop            
@@ -179,12 +227,18 @@ function [ ] = waitForAcquisitionComplete( abacus_object, maxwait_s, max_try )
         
         tElapsed = toc(tStart);
         if (initialId ~= currentId) && (currentId > 0)
-            fprintf("\n");
-            fprintf("Now, current ID is %d\n",currentId);
+            if print_on
+                %only print in command window when print_on==true
+                fprintf("\n");
+                fprintf("Now, current ID is %d\n",currentId);
+            end
             waiting = false;
         %Step 7: max timeout validation
         elseif tElapsed > maxwait_s
-            fprintf("\n");
+            if print_on
+                %only print in command window when print_on==true
+                fprintf("\n");
+            end
             %fprintf("Maxwait expired. Consider extending your maxwait.\n");
             warning('TAUSAND:timeout','Maxwait expired. Consider extending your maxwait.')
             waiting = false;
@@ -194,4 +248,3 @@ function [ ] = waitForAcquisitionComplete( abacus_object, maxwait_s, max_try )
     
 
 end
-

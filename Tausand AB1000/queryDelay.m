@@ -1,6 +1,22 @@
 function [ value_ns ] = queryDelay( abacus_object, channel_char )
 %QUERYDELAY Reads the delay in a given channel, in ns, from a Tausand Abacus.
-%   Detailed explanation goes here
+%   Y = queryDelay(OBJ,CHR) reads the delay configuration of the single 
+%   channel specified in character CHR of the Tausand Abacus device 
+%   connected to serial port object OBJ. Returns Y, the current delay in 
+%   nanoseconds.
+%
+%   Example:
+%     % To create and connect to a Tausand Abacus device:
+%       abacus_obj = openAbacus('COM3');
+%
+%     % To assign delay in B = 20ns:
+%       configureDelay(abacus_obj,'B',20);
+%
+%     % To read current delay in B:
+%       my_delay_B_ns = queryDelay(abacus_obj,'B');
+%
+%     % To disconnect the object from the serial port:
+%       closeAbacus(abacus_obj);
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

@@ -1,6 +1,24 @@
 function [ time_left_ms ] = timeLeftQuery( abacus_object )
 %TIMELEFTQUERY Reads time left for next measurement, in ms.
-%   Detailed explanation goes here
+%   Y = timeLeftQuery(OBJ) returns Y the remaining time, in milliseconds, 
+%   for the next set of data to be available on the Tausand Abacus device 
+%   connected to serial port object OBJ. Output Y is an unsigned integer.
+%
+%   Example:
+%     % To create and connect to a Tausand Abacus device:
+%       abacus_obj = openAbacus('COM3');
+%
+%     % To read time left for next data set:
+%       my_time_ms = timeLeftQuery(abacus_obj);
+%
+%     % Wait to a new data set to be avaiable to read:
+%       pause(double(my_time_ms)/1000);
+%
+%     % Read a full set of current data in the device:
+%       [data,labels] = readMeasurement(abacus_obj);
+%
+%     % To disconnect the object from the serial port:
+%       closeAbacus(abacus_obj);
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

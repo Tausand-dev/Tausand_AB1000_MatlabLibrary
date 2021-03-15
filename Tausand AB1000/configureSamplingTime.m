@@ -1,13 +1,25 @@
 function [ value_ms ] = configureSamplingTime( abacus_object , value_ms )
 %CONFIGURESAMPLINGTIME Writes the sampling time in a Tausand Abacus.
-%   Value in miliseconds.
-%   Applies data validation before writting by coercing values if required.
+%   Y = configureSamplingTime(OBJ,X) changes the configuration of the
+%   sampling time to X milliseconds on the Tausand Abacus device connected 
+%   to serial port object OBJ. Returns Y as the actual new value of 
+%   sampling time, in milliseconds, after coercing input value.
+%
+%   Example:
+%     % To create and connect to a Tausand Abacus device:
+%       abacus_obj = openAbacus('COM3');
+%
+%     % To assign sampling time = 2s = 2000ms:
+%       configureSamplingTime(abacus_obj,2000);
+%
+%     % To disconnect the object from the serial port:
+%       closeAbacus(abacus_obj);
 
 % Author: David Guzman
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 10-Mar-2021
+% May 2019; Last update: 14-Mar-2021
 % v1.1 July 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904.
 
 %% Input validation

@@ -1,12 +1,39 @@
 function [ id ] = countersIdQuery( abacus_object )
 %COUNTERSIDQUERY Reads ID of last measurement. Integer consecutive number.
-%   Detailed explanation goes here
+%   Y = countersIdQuery(OBJ) returns the current available consecutive data
+%   measurement integer identifier, Y, on the Tausand Abacus device 
+%   connected to serial port object OBJ.
+%
+%   When configuration in the device changes, this identifier resets to 0.
+%   This value may overflow at 1 million.
+%
+%   Example:
+%     % To create and connect to a Tausand Abacus device:
+%       abacus_obj = openAbacus('COM3');
+%
+%     % To read current counters ID:
+%       my_first_id = countersIdQuery(abacus_obj);
+%
+%     % Wait to a new data set to be avaiable to read:
+%       waitForAcquisitionComplete(abacus_obj);
+%
+%     % To read once again current counters ID:
+%       my_second_id = countersIdQuery(abacus_obj);
+%
+%       if my_second_id == (my_first_id + 1)
+%           disp('Success. New set of data available.');
+%       elseif my_second_id ~= my_first_id
+%           disp('Fair success. New set of data available; some missing data.');
+%       end
+%
+%     % To disconnect the object from the serial port:
+%       closeAbacus(abacus_obj);
 
 % Author: David Guzman
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last update: 10-Mar-2021
+% May 2019; Last update: 15-Mar-2021
 % v1.1 July 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904.
 
 %% Input validation

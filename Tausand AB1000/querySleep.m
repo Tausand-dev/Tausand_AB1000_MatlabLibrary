@@ -1,6 +1,26 @@
 function [ value_ns ] = querySleep( abacus_object, channel_char )
 %QUERYSLEEP Reads the sleep in a given channel, in ns, from a Tausand Abacus.
-%   Detailed explanation goes here
+%   Y = querySleep(OBJ,CHR) reads the sleep time configuration of the
+%   single channel specified in character CHR of the Tausand Abacus device 
+%   connected to serial port object OBJ. Returns Y, the current sleep time 
+%   in nanoseconds.
+%
+%   The sleep time indicates to a channel that once a pulse arrives at time
+%   T1, any pulse that arrives between t = T1 and t = T1 + Y has to be 
+%   ignored.
+%
+%   Example:
+%     % To create and connect to a Tausand Abacus device:
+%       abacus_obj = openAbacus('COM3');
+%
+%     % To assign sleep in B = 20ns:
+%       configureSleep(abacus_obj,'B',20);
+%
+%     % To read current sleep in B:
+%       my_sleep_B_ns = querySleep(abacus_obj,'B');
+%
+%     % To disconnect the object from the serial port:
+%       closeAbacus(abacus_obj);
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

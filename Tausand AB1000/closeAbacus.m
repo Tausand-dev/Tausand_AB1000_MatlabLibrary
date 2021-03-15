@@ -4,13 +4,13 @@ function [ ] = closeAbacus( abacus_object )
 %
 %   Example:
 %     % To create and connect to a Tausand Abacus device:
-%       my_abacus_object = openAbacus('COM3');
+%       abacus_obj = openAbacus('COM3');
 %
 %     % To query the identifier of the device:
-%       idn = idnQuery(my_abacus_object);
+%       idn = idnQuery(abacus_obj);
 %
 %     % To disconnect the object from the serial port:
-%       closeAbacus(my_abacus_object);
+%       closeAbacus(abacus_obj);
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

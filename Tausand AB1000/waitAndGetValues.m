@@ -1,35 +1,57 @@
-function [ data_out, labels_out ] = waitAndGetValues( abacus_object, channels, maxwait_s, max_try )
+function [ data_out, labels_out ] = waitAndGetValues( abacus_object, channels, print_on, maxwait_s, max_try )
 %WAITANDGETVALUES Waits and read counters of the specified channels.
-%   Waits until counters_ID changes in a Tausand Abacus. Then, reads a set
-%   of measurements. Returns a subset of the measurements, following the
-%   specified channels as input.
+%   [V,T] = waitAndGetValues(OBJ,S,A,X,Y)     Waits until a new set of data
+%   becomes available on the Tausand Abacus device connected to serial port 
+%   object OBJ, and then reads a set of measurements, including single and 
+%   coincidence counters, as requested in the optional string array input 
+%   S. When optional logical input A is TRUE, this function prints 
+%   information messages in command window. Optional input X is a number 
+%   indicating the maximum time to wait, in seconds. Optional input Y is an 
+%   integer number indicating the maximum trials of communication within 
+%   the function. Default values are: A=false, X=10, Y=6. Returns a subset 
+%   of the measurements, as requested by the S array channels input. 
+%   Returns two equally sized arrays, V with integer values, and T with 
+%   their corresponding counter label strings.
 %
-%   Input arguments:
-%       abacus_object   Reference to the Tausand Abacus device
+%   [V,T]=waitAndGetValues(OBJ,S,A,X)  Uses max_try=6.
 %
-%   Optional arguments: 
-%       channels        String array. Indicates the channels to be read.
-%                       Default: return all measurements.
-%                       Examples:   
-%                           ["A","B","AB"]      to read counts in A, in B,
-%                           and coincidences in AB
-%                           ["AB","AC","AD"]    to read coindicences
-%                           between A and B,C,D.
-%                           ["A","multiple_1"]  use the string "multiple_1"
-%                           to get coincidences of the multi-fold channel #1.
-%                           ["hello"]   since no channel is named 'hello',
-%                           this funcion will return an empty
-%       maxwait_s   Maximum time to wait. Default=10.
-%       max_try     Maximum trials of communication. Default=6.
+%   [V,T]=waitAndGetValues(OBJ,S,A)    Uses maxwait_s=10, max_try=6.
 %
-%   Outputs:
-%       data_out    Array of integer values
+%   [V,T]=waitAndGetValues(OBJ,S)      Uses maxwait_s=10, max_try=6, 
+%                                      print_on=false.
+%
+%   [V,T]=waitAndGetValues(OBJ)        Uses maxwait_s=10, max_try=6, 
+%                                      print_on=false, returning all data.
+%
+%   The order of the returned data may not be the same as the order
+%   specified in input array S. Field 'counters_ID' is always included 
+%   within the output [V,T].
+%
+%   Example:
+%     % To create and connect to a Tausand Abacus device:
+%       abacus_obj = openAbacus('COM3');
+%
+%     % Wait and read a full set of new data in the device:
+%       [data,labels] = waitAndGetValues(abacus_obj);
+%
+%     % Wait and read a selected subset of new data in the device:
+%       [data,labels] = waitAndGetValues(abacus_obj,["B","AB","BC"]);
+%
+%     % Wait and read a full set of new data, printing messages:
+%       [data,labels] = waitAndGetValues(abacus_obj,'',true);
+%
+%     % Wait and read a full set of new data, up to 5 seconds, no messages:
+%       [data,labels] = waitAndGetValues(abacus_obj,'',false,5);
+%
+%     % To disconnect the object from the serial port:
+%       closeAbacus(abacus_obj);
+%
 
 % Author: David Guzman
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% March 2021; Last revision: 9-Mar-2021
+% March 2021; Last revision: 15-Mar-2021
 
     %% 1. Validate inputs
     if ~isa(abacus_object,'serial')
@@ -43,7 +65,18 @@ function [ data_out, labels_out ] = waitAndGetValues( abacus_object, channels, m
         channels = [];
     end
     
-    if (nargin<3)
+    if (nargin<3) %new v1.1
+        %if print_on is not given
+        print_on = false;   %set default value: off
+    else
+        if ~islogical(print_on)
+            errorStruct.message = 'Input ''print_on'' must be a logical value: true, false.';
+            errorStruct.identifier = 'TAUSAND:incorrectType';
+            error(errorStruct)
+        end
+    end
+    
+    if (nargin<4)
         %if maxwait_s is not given
         maxwait_s=10;   %set default value: 10 seconds
     else
@@ -60,7 +93,7 @@ function [ data_out, labels_out ] = waitAndGetValues( abacus_object, channels, m
         end
     end
     
-    if (nargin<4)
+    if (nargin<5)
         %if max_try is not given
         max_try=6;   %set default value: 6.
     else
@@ -84,16 +117,15 @@ function [ data_out, labels_out ] = waitAndGetValues( abacus_object, channels, m
     %get current state of warning 'TAUSAND:timeout'
     s=warning('query','TAUSAND:timeout');
     wasTimeoutWarningOn = strcmp(s.state,'on');
-
+    
     %% 2. Wait
-
-    waitForAcquisitionComplete(abacus_object,maxwait_s,max_try);
+    waitForAcquisitionComplete(abacus_object,print_on,maxwait_s,max_try);
 
     %% 3. Read measurements
     if wasTimeoutWarningOn
         warning('off','TAUSAND:timeout');   %turn off timeout warnings. If so, a retry will be done anyway.
     end
-    for (attempt=1:max_try)
+    for attempt=1:max_try
         try
             [ all_data, all_labels ] = readMeasurement( abacus_object );
             if ~isempty(all_data) %if data read ok
@@ -121,7 +153,7 @@ function [ data_out, labels_out ] = waitAndGetValues( abacus_object, channels, m
     end
 
     %% 4. Return desired subset
-    if ~isempty(all_data)
+    if (~isempty(all_data)) && (~isempty(all_labels))
         if ~isempty(channels)
             channels = ["ID",channels]; %this forces to prepend counters_ID to result
             channels = strcat("_",channels); %prepend "_" to each selection

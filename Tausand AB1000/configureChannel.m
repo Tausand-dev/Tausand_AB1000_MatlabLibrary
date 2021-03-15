@@ -1,11 +1,11 @@
 function [ delay_ns, sleep_ns ] = configureChannel( abacus_object, channel_char, delay_ns, sleep_ns )
 %CONFIGURECHANNEL Configures delay and sleep in a single channel.
-%   [X,Y]=configureChannel(OBJ,CHR,Z,W) changes the configuration of the
-%   single channel specified in character CHR of the device connected to
-%   serial port object OBJ. Assigns a delay of Z nanoseconds and a sleep
-%   time of W nanoseconds. Returns X as the actual new value of delay in
-%   nanoseconds, and Y as the actual new value of sleep in nanoseconds,
-%   after coercing input values.
+%   [Z,W] = configureChannel(OBJ,CHR,X,Y) changes the configuration of the
+%   single channel specified in character CHR of the Tausand Abacus device 
+%   connected to serial port object OBJ. Assigns a delay of X nanoseconds 
+%   and a sleep time of Y nanoseconds. Returns Z as the actual new value of 
+%   delay in nanoseconds, and W as the actual new value of sleep in 
+%   nanoseconds, after coercing input values.
 %
 %   Example:
 %     % To create and connect to a Tausand Abacus device:

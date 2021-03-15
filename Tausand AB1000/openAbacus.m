@@ -1,30 +1,28 @@
 function [ abacus_obj ] = openAbacus( port )
 %OPENABACUS Opens and configures a Tasuand Abacus AB1000
-%   A = openAbacus('PORT') returns an object linked to a new connection
-%   established with a Tausand Abacus device, connected in the port PORT.
-%   If PORT does not exist, is not a Tausand Abacus device, or is in use 
-%   you will not be able to connect the serial port object to the device.
-%   
-%   A is a serial port object, that can be used with other functions to
-%   communicate with the device.
+%   OBJ = openAbacus(STR) returns a serial object OBJ linked to a new 
+%   connection established with a Tausand Abacus device, connected in port 
+%   STR. If port STR does not exist, is not a Tausand Abacus device, or is 
+%   in use, you will not be able to connect the serial port object to the 
+%   device. OBJ is a serial port object, that can be used with other 
+%   functions to communicate with the device.
 %
 %   Example:
 %     % To create and connect to a Tausand Abacus device:
-%       my_abacus_object = openAbacus('COM3');
+%       abacus_obj = openAbacus('COM3');
 %
 %     % To query the identifier of the device:
-%       idn = idnQuery(my_abacus_object);
+%       idn = idnQuery(abacus_obj);
 %
 %     % To disconnect the object from the serial port:
-%       closeAbacus(my_abacus_object);
-
+%       closeAbacus(abacus_obj);
 
 % Author: David Guzman
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last revision: 4-Mar-2021
-% v1.1  September 2020. Sets timeout=1s.
+% May 2019; Last revision: 15-Mar-2021
+% v1.1  September 2020. Sets timeout=0.5s.
 %       March 2021. Single append of device reference "ABxxxx" in object name
 
 %% Instrument Connection
@@ -50,7 +48,7 @@ if ~contains(serial_name,device_type_str) %v1.1
     serial_name = strcat(serial_name,device_type_str);
     set(obj1,'Name',serial_name);    %assign Tag to DeviceType
 end
-set(obj1,'Timeout',1); %set timeout of device to 1s. By default Matlab sets timeout to 10s %new on v1.1
+set(obj1,'Timeout',0.5); %set timeout of device to 0.5s. By default Matlab sets timeout to 10s %new on v1.1
 abacus_obj = obj1;
 
 end

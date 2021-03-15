@@ -1,19 +1,19 @@
 function [ idn ] = idnQuery( abacus_object )
 %IDNQUERY Identification request *IDN?
-%   S = idnQuery(OBJECT) returns a string S corresponding to the identifier
-%   string linked to the serial port object OBJECT. If OBJECT does not
+%   STR = idnQuery(OBJ) returns a string STR corresponding to the 
+%   identifier string linked to the serial port object OBJ. If OBJ does not 
 %   exist, is closed, or is not a Tausand Abacus device, you will not be 
 %   able to get a response.
 %
 %   Example:
 %     % To create and connect to a Tausand Abacus device:
-%       my_abacus_object = openAbacus('COM3');
+%       abacus_obj = openAbacus('COM3');
 %
 %     % To query the identifier of the device:
-%       idn = idnQuery(my_abacus_object);
+%       idn = idnQuery(abacus_obj);
 %
 %     % To disconnect the object from the serial port:
-%       closeAbacus(my_abacus_object);
+%       closeAbacus(abacus_obj);
 
 % Author: David Guzman
 % Tausand Electronics, Colombia
@@ -31,7 +31,7 @@ if ~isa(abacus_object,'serial')
 end
 
 %% Function
-tic
+tIdnQuery = tic;
 maxtimeout = 0.2; %200ms
 clearBuffer(abacus_object) %new v1.1, 2021-03
 
@@ -64,19 +64,19 @@ secsToWait=0.05; %50ms
 % method 2: read and ask if more bytes arrive
 bytesInPort = abacus_object.BytesAvailable;
 idn = [];
-while (bytesInPort == 0) && (toc < maxtimeout)
+while (bytesInPort == 0) && (toc(tIdnQuery) < maxtimeout)
     bytesInPort = abacus_object.BytesAvailable;
 end
 
-while (bytesInPort > 0) && (toc < maxtimeout)
+while (bytesInPort > 0) && (toc(tIdnQuery) < maxtimeout)
     idn = [idn,fscanf(abacus_object,'%c',bytesInPort)]; % '%c' includes whitespaces
     pause(secsToWait);
     bytesInPort = abacus_object.BytesAvailable;
 end
 
-if toc > maxtimeout
+if toc(tIdnQuery) > maxtimeout
     warning('TAUSAND:timeout','Timeout in function idnQuery.')
-    %toc;
+    %toc(tIdnQuery);
 end
 
 end

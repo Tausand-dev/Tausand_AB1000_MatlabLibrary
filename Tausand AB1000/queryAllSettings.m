@@ -1,15 +1,29 @@
 function [ data_out, labels_out ] = queryAllSettings( abacus_object )
 %QUERYALLSETTINGS Reads all settings from a Tausand Abacus.
+%   [V,S] = queryAllSettings(OBJ) reads all the configuration parameters of 
+%   the Tausand Abacus device connected to serial port object OBJ. Returns 
+%   two equally sized arrays, V with integer values, and S with their 
+%   corresponding parameter label strings.
+%
+%   Possible 'labels' in array S are:
+%   "sampling": in ms
+%   "coincidence_window": in ns
+%   "delay_I": delay in ns in channel I
+%   "sleep_I": sleep time in ns in channel I
+%   "config_multiple_J": multi-fold coincidence configuration for counter J
+%
 %   This function is more efficient than reading every setting separately.
+%
+%   Example:
+%     % To create and connect to a Tausand Abacus device:
+%       abacus_obj = openAbacus('COM3');
+%
+%     % Read all current settings in the device:
+%       [data,labels] = queryAllSettings(abacus_obj);
+%
+%     % To disconnect the object from the serial port:
+%       closeAbacus(abacus_obj);
 % 
-%   Returns two equally sized arrays: 'labels' and 'values'. Possible 
-%   'labels' are: 
-%       "sampling": in ms
-%       "coincidence_window": in ns
-%       "delay_X": delay in ns in channel X
-%       "sleep_X": sleep time in ns in channel X
-%       "config_multiple_X": multi-fold coincidence configuration for 
-%                            counter X
 
 % Author: David Guzman
 % Tausand Electronics, Colombia

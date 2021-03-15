@@ -1,11 +1,45 @@
 function [ ports, count ] = findDevices( device_type )
-%FINDDEVICES Finds serial ports of Tausand Abacus devices matching device_type. Possible device_type values are: 1002, 1004 or 0 (for both).
+%FINDDEVICES Scans and finds serial ports with Tausand Abacus devices.
+%   [S,N] = findDevices()   Scans every serial port in the computer, tries
+%   to open them as a Tausand Abacus device, with any valid reference (i.e.
+%   AB1002, AB1004, AB1502, AB1504, AB1902, AB1904). Returns a string array 
+%   S with the current valid ports responding adequately, and the size N of
+%   this array.
+%
+%   [S,N] = findDevices(X)   Scans every serial port in the computer, tries
+%   to open them as a Tausand Abacus device, matching with the device type
+%   indicated in the integer value X. Valid values of input X are: 1002,
+%   1004, 1502, 1504, 1902 and 1904. Returns a string array S with the 
+%   current valid ports responding adequately with matching type, and the 
+%   size N of this array.
+%
+%   Once you find the serial port associated to your device, you do not 
+%   need to use this function anymore. The first time a Tausand Abacus 
+%   device connects to a computer, it gets a unique serial port that is 
+%   assigned and reserved for future connections.
+%
+%   Example:
+%     % Scan and find serial ports with any Tausand Abacus device:
+%       [my_ports, num_ports] = findDevices();
+%
+%     % Connect and disconnect to the first found device:
+%       if num_ports > 0
+%           abacus_obj = openAbacus(my_ports{1});   %connect
+%           disp(['Connected to Tausand Abacus in port ',my_ports{1}]);
+%           % use the device (read, configure,...)
+%           closeAbacus(abacus_obj);    %disconnect
+%       else
+%           disp('No Tausand Abacus devices were found');
+%       end
+%
+%     % Scan and find serial ports with Tausand Abacus AB1504 devices:
+%       [my_ports_1504, num_ports_1504] = findDevices(1504);
 
 % Author: David Guzman
 % Tausand Electronics, Colombia
 % email: dguzman@tausand.com
 % Website: http://www.tausand.com
-% May 2019; Last revision: 11-Mar-2021
+% May 2019; Last revision: 15-Mar-2021
 %   v1.1 Input 'device_type' is not mandatory
 %        warnings thrown by deviceTypeQuery are turned off
 

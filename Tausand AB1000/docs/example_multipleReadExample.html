@@ -1,0 +1,374 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tausand AB1000 library example: Multiple Read Example</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-03-15"><meta name="DC.source" content="example_multipleReadExample.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Tausand AB1000 library example: Multiple Read Example</h1><!--introduction--><p>Reads continously and saves data from a Tausand Abacus coincidence counter. Uses functions in the Tausand_AB1000_MatlabLibrary. Handles errors and retry readings and connections when lost. To be used in Matlab's command window.</p><p>Author: David Guzman. Tausand Electronics, Colombia. March 2021; Last update: 15-Mar-2021.</p><p>Contact email: <a href="mailto:dguzman@tausand.com">dguzman@tausand.com</a>. Website: <a href="http://www.tausand.com">http://www.tausand.com</a></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Constants to be defined by user</a></li><li><a href="#3">Establish a connection</a></li><li><a href="#4">Write and read new settings</a></li><li><a href="#9">Create plaintext file</a></li><li><a href="#12">Multiple read using function waitAndGetValues</a></li><li><a href="#13">Close connection and close file</a></li></ul></div><h2 id="1">Constants to be defined by user</h2><pre class="codeinput">samples_to_read = 10; <span class="comment">%change this parameter to set how many samples to read</span>
+my_sampling_time_ms = 1000; <span class="comment">%change this parameter to set your sampling time. 1000=1s.</span>
+my_port = <span class="string">'COM23'</span>; <span class="comment">%change this port to the adequate one</span>
+</pre><p>Define the desired channels to be read. Example:</p><pre class="codeinput">channels_to_read = [<span class="string">"A"</span>,<span class="string">"B"</span>,<span class="string">"C"</span>,<span class="string">"AB"</span>,<span class="string">"AC"</span>,<span class="string">"multiple_1"</span>]; <span class="comment">%multiple_1 corresponds to a multi-fold mesurement, to be configured, e.g. 'ABC'</span>
+</pre><h2 id="3">Establish a connection</h2><pre class="codeinput">disp(<span class="string">"******************************"</span>);
+disp(<span class="string">"MATLAB multiple read example"</span>);
+disp(<span class="string">"******************************"</span>);
+disp(<span class="string">"1. Establish a connection"</span>);
+
+my_abacus = openAbacus(my_port)
+device_idn = idnQuery(my_abacus)
+</pre><pre class="codeoutput">******************************
+MATLAB multiple read example
+******************************
+1. Establish a connection
+
+   Serial Port Object : Serial-COM23 AB1504
+
+   Communication Settings 
+      Port:               COM23
+      BaudRate:           115200
+      Terminator:         'LF'
+
+   Communication State 
+      Status:             open
+      RecordStatus:       off
+
+   Read/Write State  
+      TransferStatus:     idle
+      BytesAvailable:     0
+      ValuesReceived:     21
+      ValuesSent:         7
+ 
+
+
+device_idn =
+
+    'Tausand Abacus AB1504'
+
+</pre><h2 id="4">Write and read new settings</h2><pre class="codeinput">disp(<span class="string">"2. Write and read new settings"</span>);
+</pre><pre class="codeoutput">2. Write and read new settings
+</pre><p>Write settings, using configureByName function:</p><pre class="codeinput">configureByName(my_abacus,<span class="string">"sampling"</span>,my_sampling_time_ms);
+</pre><p>Several configurations may be applied with a single command line:</p><pre class="codeinput">configureByName(my_abacus,<span class="keyword">...</span>
+    [<span class="string">"coincidence_window"</span>,<span class="string">"delay_A"</span>,<span class="string">"delay_B"</span>,<span class="string">"sleep_A"</span>,<span class="string">"sleep_B"</span>],<span class="keyword">...</span>
+    [50,0,10,0,20]);
+    <span class="comment">%this sets: coincidence_window=50ns, delay_A=0ns, delay_B=10ns,</span>
+    <span class="comment">%sleep_A=0ns, sleep_B=20ns.</span>
+</pre><p>Upgrade 'TAUSAND:timeout' warning to an error, to catch them.</p><pre class="codeinput">my_warn = warning(<span class="string">'error'</span>, <span class="string">'TAUSAND:timeout'</span>);
+</pre><p>Read current settings</p><pre class="codeinput">max_try=5;
+<span class="keyword">for</span> attempt=1:max_try
+    <span class="keyword">try</span>
+        [setting_values,setting_labels]=queryAllSettings(my_abacus);
+        current_settings=[setting_labels,setting_values];
+        disp(<span class="string">'Current settings are:'</span>);
+        disp([setting_labels,setting_values]);
+        <span class="keyword">break</span>;
+    <span class="keyword">catch</span> ME
+        <span class="keyword">switch</span> ME.identifier
+            <span class="keyword">case</span> {<span class="string">'TAUSAND:unexpectedReadByte'</span>,<span class="keyword">...</span>
+                    <span class="string">'TAUSAND:checksumFailed'</span>,<span class="string">'TAUSAND:timeout'</span>}
+                <span class="comment">%ignore these errors, just retry.</span>
+            <span class="keyword">case</span> <span class="string">'MATLAB:serial:fwrite:opfailed'</span>
+                <span class="comment">%if connection is lost, maybe device has been</span>
+                <span class="comment">%disconnected</span>
+                closeAbacus(my_abacus)
+                <span class="keyword">try</span>
+                    openAbacus(my_abacus)
+                <span class="keyword">catch</span>
+                    <span class="comment">%ignore error</span>
+                <span class="keyword">end</span>
+            <span class="keyword">otherwise</span>
+                warning(<span class="string">'Unexpected error. Device connection closed.'</span>)
+                closeAbacus(my_abacus)
+                rethrow(ME)
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+warning(my_warn.state, <span class="string">'TAUSAND:timeout'</span>); <span class="comment">% Restore this warning back to their previous (non-error) state</span>
+<span class="keyword">if</span> (attempt == max_try)
+    warning(<span class="string">'TAUSAND:timeout'</span>,[<span class="string">'Communication error after '</span>,int2str(max_try),<span class="string">' attempts'</span>]);
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Current settings are:
+    "sampling"              "1000"
+    "coincidence_window"    "50"  
+    "delay_A"               "0"   
+    "delay_B"               "10"  
+    "delay_C"               "0"   
+    "delay_D"               "0"   
+    "sleep_A"               "0"   
+    "sleep_B"               "20"  
+    "sleep_C"               "0"   
+    "sleep_D"               "0"   
+    "config_multiple_1"     "240" 
+
+</pre><h2 id="9">Create plaintext file</h2><pre class="codeinput">disp(<span class="string">"3. Create file"</span>);
+date_time_string = string(datetime,<span class="string">'yyyy-MM-dd_HHmmss'</span>);
+column_headers = cat(2,[<span class="string">"PC time"</span>,<span class="string">"countersID"</span>],channels_to_read);
+file_name = strcat(<span class="string">'data_multipleReadExample_'</span>,date_time_string,<span class="string">'.txt'</span>);
+</pre><pre class="codeoutput">3. Create file
+</pre><p>Create file,</p><pre class="codeinput">myfile = fopen(file_name, <span class="string">'a'</span>); <span class="comment">%create file in append mode</span>
+disp(strcat(<span class="string">"File "</span>,file_name,<span class="string">" has been created"</span>));
+</pre><pre class="codeoutput">File data_multipleReadExample_2021-03-15_154832.txt has been created
+</pre><p>and write file headers,</p><pre class="codeinput">fwrite(myfile,[<span class="string">'multipleReadExample'</span>,newline]);
+fwrite(myfile,[<span class="string">'-------------------'</span>,newline]);
+fwrite(myfile,[<span class="string">'Begin time: '</span>,char(date_time_string),newline]);
+fwrite(myfile,[<span class="string">'Device: '</span>,device_idn,newline]);
+fwrite(myfile,[<span class="string">'Settings: '</span>,newline]);
+fprintf(myfile,<span class="string">'%s\t%s\n'</span>,[setting_labels,num2str(setting_values)]');
+fwrite(myfile,[newline,newline]);
+fprintf(myfile,<span class="string">'%s\t'</span>,column_headers);
+fwrite(myfile,newline);
+</pre><h2 id="12">Multiple read using function waitAndGetValues</h2><pre class="codeinput">disp(<span class="string">'4. Multiple read using waitAndGetValues function begins'</span>);
+fprintf(<span class="string">'\t%s'</span>,column_headers); <span class="comment">%print in command window</span>
+fprintf(<span class="string">'\n'</span>);
+tMultipleReadExample = tic;
+<span class="keyword">for</span> sample=1:samples_to_read
+    <span class="keyword">try</span>
+        my_data = waitAndGetValues(my_abacus,channels_to_read);
+        s=strcat(sprintf(<span class="string">'%.3f'</span>,toc(tMultipleReadExample)),sprintf(<span class="string">'\t%d'</span>,my_data),string(newline));
+        fwrite(myfile,s);
+        t = [num2str(sample),<span class="string">'/'</span>,num2str(samples_to_read)];
+        fprintf(<span class="string">'%s\t%s'</span>,t,s);    <span class="comment">%print data in command window</span>
+    <span class="keyword">catch</span> ME
+        <span class="keyword">switch</span> ME.identifier
+            <span class="keyword">case</span> {<span class="string">'TAUSAND:unexpectedReadByte'</span>,<span class="keyword">...</span>
+                    <span class="string">'TAUSAND:checksumFailed'</span>,<span class="string">'TAUSAND:timeout'</span>}
+                <span class="comment">%ignore these errors, just continue.</span>
+            <span class="keyword">case</span> <span class="string">'MATLAB:serial:fwrite:opfailed'</span>
+                <span class="comment">%if connection is lost, maybe device has been</span>
+                <span class="comment">%disconnected</span>
+                closeAbacus(my_abacus)
+                <span class="keyword">try</span>
+                    openAbacus(my_abacus)
+                <span class="keyword">catch</span>
+                    <span class="comment">%ignore error</span>
+                <span class="keyword">end</span>
+            <span class="keyword">otherwise</span>
+                warning(<span class="string">'Unexpected error. Device connection closed. File access closed.'</span>)
+                fclose(myfile);
+                closeAbacus(my_abacus)
+                rethrow(ME)
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">4. Multiple read using waitAndGetValues function begins
+	PC time	countersID	A	B	C	AB	AC	multiple_1
+1/10	0.273	1823	15624	31249	31249	15624	15624	1736
+2/10	1.433	1824	15625	31250	31250	15625	15625	1736
+3/10	2.232	1825	15625	31249	31249	15625	15625	1737
+4/10	3.226	1826	15624	31249	31249	15624	15624	1736
+5/10	4.274	1827	15625	31250	31250	15625	15625	1736
+6/10	5.235	1828	15625	31249	31249	15625	15625	1736
+7/10	6.209	1829	15624	31249	31249	15624	15624	1736
+8/10	7.268	1830	15625	31249	31249	15625	15625	1736
+9/10	8.199	1831	15625	31250	31250	15625	15625	1736
+10/10	9.250	1832	15624	31249	31249	15624	15624	1736
+</pre><h2 id="13">Close connection and close file</h2><pre class="codeinput">fclose(myfile);
+closeAbacus(my_abacus)
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tausand AB1000 library example: Multiple Read Example
+% Reads continously and saves data from a Tausand Abacus coincidence 
+% counter. Uses functions in the Tausand_AB1000_MatlabLibrary. Handles 
+% errors and retry readings and connections when lost. To be used in 
+% Matlab's command window.
+%
+% Author: David Guzman.
+% Tausand Electronics, Colombia.
+% March 2021; Last update: 15-Mar-2021.
+%
+% Contact email: dguzman@tausand.com. 
+% Website: http://www.tausand.com
+%
+
+
+%% Constants to be defined by user
+samples_to_read = 10; %change this parameter to set how many samples to read
+my_sampling_time_ms = 1000; %change this parameter to set your sampling time. 1000=1s.
+my_port = 'COM23'; %change this port to the adequate one
+
+%%
+% Define the desired channels to be read. Example:
+channels_to_read = ["A","B","C","AB","AC","multiple_1"]; %multiple_1 corresponds to a multi-fold mesurement, to be configured, e.g. 'ABC'
+
+%% Establish a connection
+disp("******************************");
+disp("MATLAB multiple read example");
+disp("******************************");
+disp("1. Establish a connection");
+
+my_abacus = openAbacus(my_port)
+device_idn = idnQuery(my_abacus)
+
+%% Write and read new settings
+disp("2. Write and read new settings");
+%%
+% Write settings, using configureByName function:
+configureByName(my_abacus,"sampling",my_sampling_time_ms);
+%%
+% Several configurations may be applied with a single command line:
+configureByName(my_abacus,...
+    ["coincidence_window","delay_A","delay_B","sleep_A","sleep_B"],...
+    [50,0,10,0,20]);
+    %this sets: coincidence_window=50ns, delay_A=0ns, delay_B=10ns,
+    %sleep_A=0ns, sleep_B=20ns.
+    
+%%
+% Upgrade 'TAUSAND:timeout' warning to an error, to catch them.
+my_warn = warning('error', 'TAUSAND:timeout');
+%%
+% Read current settings
+max_try=5;
+for attempt=1:max_try
+    try
+        [setting_values,setting_labels]=queryAllSettings(my_abacus);
+        current_settings=[setting_labels,setting_values];
+        disp('Current settings are:');
+        disp([setting_labels,setting_values]);
+        break;
+    catch ME
+        switch ME.identifier
+            case {'TAUSAND:unexpectedReadByte',...
+                    'TAUSAND:checksumFailed','TAUSAND:timeout'}
+                %ignore these errors, just retry.                    
+            case 'MATLAB:serial:fwrite:opfailed'
+                %if connection is lost, maybe device has been
+                %disconnected
+                closeAbacus(my_abacus)
+                try
+                    openAbacus(my_abacus)
+                catch
+                    %ignore error
+                end                    
+            otherwise
+                warning('Unexpected error. Device connection closed.')
+                closeAbacus(my_abacus)
+                rethrow(ME)
+        end
+    end
+end
+warning(my_warn.state, 'TAUSAND:timeout'); % Restore this warning back to their previous (non-error) state
+if (attempt == max_try)
+    warning('TAUSAND:timeout',['Communication error after ',int2str(max_try),' attempts']);
+end
+
+%% Create plaintext file
+disp("3. Create file");
+date_time_string = string(datetime,'yyyy-MM-dd_HHmmss');
+column_headers = cat(2,["PC time","countersID"],channels_to_read);
+file_name = strcat('data_multipleReadExample_',date_time_string,'.txt');
+%%
+% Create file,
+myfile = fopen(file_name, 'a'); %create file in append mode
+disp(strcat("File ",file_name," has been created"));
+%%
+% and write file headers,
+fwrite(myfile,['multipleReadExample',newline]);
+fwrite(myfile,['REPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASHREPLACE_WITH_DASH_DASH-',newline]);
+fwrite(myfile,['Begin time: ',char(date_time_string),newline]);
+fwrite(myfile,['Device: ',device_idn,newline]);
+fwrite(myfile,['Settings: ',newline]);
+fprintf(myfile,'%s\t%s\n',[setting_labels,num2str(setting_values)]');
+fwrite(myfile,[newline,newline]);
+fprintf(myfile,'%s\t',column_headers);
+fwrite(myfile,newline);
+
+%% Multiple read using function waitAndGetValues 
+disp('4. Multiple read using waitAndGetValues function begins');
+fprintf('\t%s',column_headers); %print in command window
+fprintf('\n');
+tMultipleReadExample = tic;
+for sample=1:samples_to_read
+    try
+        my_data = waitAndGetValues(my_abacus,channels_to_read);
+        s=strcat(sprintf('%.3f',toc(tMultipleReadExample)),sprintf('\t%d',my_data),string(newline));
+        fwrite(myfile,s);
+        t = [num2str(sample),'/',num2str(samples_to_read)];
+        fprintf('%s\t%s',t,s);    %print data in command window
+    catch ME
+        switch ME.identifier
+            case {'TAUSAND:unexpectedReadByte',...
+                    'TAUSAND:checksumFailed','TAUSAND:timeout'}
+                %ignore these errors, just continue.                    
+            case 'MATLAB:serial:fwrite:opfailed'
+                %if connection is lost, maybe device has been
+                %disconnected
+                closeAbacus(my_abacus)
+                try
+                    openAbacus(my_abacus)
+                catch
+                    %ignore error
+                end                    
+            otherwise
+                warning('Unexpected error. Device connection closed. File access closed.')
+                fclose(myfile);
+                closeAbacus(my_abacus)
+                rethrow(ME)
+        end
+    end
+end
+
+%% Close connection and close file
+fclose(myfile);
+closeAbacus(my_abacus)
+##### SOURCE END #####
+--></body></html>

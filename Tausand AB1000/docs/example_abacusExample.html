@@ -1,0 +1,395 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Tausand AB1000 Matlab library example: Abacus Example</title><meta name="generator" content="MATLAB 9.2"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-03-15"><meta name="DC.source" content="example_abacusExample.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Tausand AB1000 Matlab library example: Abacus Example</h1><!--introduction--><p>A set of basic commands to test Tausand_AB1000_MatlabLibrary to be used in Matlab's command window</p><p>Author: David Guzman. Tausand Electronics, Colombia. March 2021; Last update: 15-Mar-2021.</p><p>Contact email: <a href="mailto:dguzman@tausand.com">dguzman@tausand.com</a>. Website: <a href="http://www.tausand.com">http://www.tausand.com</a></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Find devices and establish a connection</a></li><li><a href="#5">Read device settings</a></li><li><a href="#7">Write device settings</a></li><li><a href="#11">Read measurements from device</a></li><li><a href="#13">Multiple coincidence setting and reading</a></li><li><a href="#14">Close connection</a></li></ul></div><h2 id="1">Find devices and establish a connection</h2><pre class="codeinput">disp(<span class="string">'*********************'</span>);
+disp(<span class="string">'MATLAB Abacus example'</span>);
+disp(<span class="string">'*********************'</span>);
+disp(<span class="string">'1.  Find devices and establish a connection'</span>);
+</pre><pre class="codeoutput">*********************
+MATLAB Abacus example
+*********************
+1.  Find devices and establish a connection
+</pre><p>Find Tausand Abacus devices with reference AB1504.</p><pre class="codeinput">disp(<span class="string">'1a.  Find Tausand Abacus devices with reference AB1504'</span>);
+[ports,n] = findDevices(1504); <span class="comment">%1504: look for only 1504 devices</span>
+disp([<span class="string">'Found '</span>,int2str(n),<span class="string">' device(s) with reference 1504'</span>]);
+</pre><pre class="codeoutput">1a.  Find Tausand Abacus devices with reference AB1504
+Progress: 1/2
+Progress: 2/2
+Found 1 device(s) with reference 1504
+</pre><p>Find Tausand Abacus devices with any reference.</p><pre class="codeinput">disp(<span class="string">'1b.  Find Tausand Abacus devices with any reference'</span>);
+[ports,n] = findDevices(); <span class="comment">%(): any device</span>
+disp([<span class="string">'Found '</span>,int2str(n),<span class="string">' device(s) with any reference'</span>]);
+
+<span class="keyword">if</span> n==0
+    disp(<span class="string">'No valid devices were found. Closing.'</span>);
+    <span class="keyword">return</span>
+<span class="keyword">end</span>
+
+disp(<span class="string">'Available valid devices:'</span>);
+ports
+</pre><pre class="codeoutput">1b.  Find Tausand Abacus devices with any reference
+Progress: 1/2
+Progress: 2/2
+Found 1 device(s) with any reference
+Available valid devices:
+
+ports = 
+
+    "COM23"
+
+</pre><p>Connect to the first device found.</p><pre class="codeinput">disp(<span class="string">'Select the first found device to connect with.'</span>);
+my_device_port = ports{1}
+my_abacus = openAbacus(my_device_port)
+
+disp(<span class="string">'Connected to the following device:'</span>);
+myidnstring = idnQuery(my_abacus);
+mydevicetype = deviceTypeQuery(my_abacus);
+disp([<span class="string">'idn (string): '</span>,char(9),char(9),char(9),myidnstring]);
+disp([<span class="string">'device type (integer): '</span>,char(9),int2str(mydevicetype)]);
+</pre><pre class="codeoutput">Select the first found device to connect with.
+
+my_device_port =
+
+    'COM23'
+
+
+   Serial Port Object : Serial-COM23 AB1504
+
+   Communication Settings 
+      Port:               COM23
+      BaudRate:           115200
+      Terminator:         'LF'
+
+   Communication State 
+      Status:             open
+      RecordStatus:       off
+
+   Read/Write State  
+      TransferStatus:     idle
+      BytesAvailable:     0
+      ValuesReceived:     21
+      ValuesSent:         7
+ 
+
+Connected to the following device:
+idn (string): 			Tausand Abacus AB1504
+device type (integer): 	1504
+</pre><h2 id="5">Read device settings</h2><p>Example of reading all device settings</p><pre class="codeinput">disp(<span class="string">"********************"</span>)
+disp(<span class="string">"2. Read device settings"</span>)
+disp(<span class="string">'Settings read from device, using queryAllSettings function:'</span>);
+[my_sett_data,my_sett_labels]=queryAllSettings(my_abacus);
+current_settings=[my_sett_labels,my_sett_data];
+disp(current_settings);
+</pre><pre class="codeoutput">********************
+2. Read device settings
+Settings read from device, using queryAllSettings function:
+    "sampling"              "2000"
+    "coincidence_window"    "100" 
+    "delay_A"               "0"   
+    "delay_B"               "20"  
+    "delay_C"               "0"   
+    "delay_D"               "0"   
+    "sleep_A"               "0"   
+    "sleep_B"               "20"  
+    "sleep_C"               "0"   
+    "sleep_D"               "0"   
+    "config_multiple_1"     "224" 
+
+</pre><p>Examples reading single settings</p><pre class="codeinput">disp(<span class="string">'Query each setting by separate:'</span>);
+value=queryDelay(my_abacus,<span class="string">'A'</span>);
+disp([<span class="string">' Current delay in A: '</span>,int2str(value),<span class="string">'ns'</span>]);
+value=queryDelay(my_abacus,<span class="string">'B'</span>);
+disp([<span class="string">' Current delay in B: '</span>,int2str(value),<span class="string">'ns'</span>]);
+value=querySleep(my_abacus,<span class="string">'A'</span>);
+disp([<span class="string">' Current sleep in A: '</span>,int2str(value),<span class="string">'ns'</span>]);
+value=querySleep(my_abacus,<span class="string">'B'</span>);
+disp([<span class="string">' Current sleep in B: '</span>,int2str(value),<span class="string">'ns'</span>]);
+value=queryCoincidenceWindow(my_abacus);
+disp([<span class="string">' Current coincidence window: '</span>,int2str(value),<span class="string">'ns'</span>]);
+value=querySamplingTime(my_abacus);
+disp([<span class="string">' Current sampling: '</span>,int2str(value),<span class="string">'ms'</span>]);
+text=queryMultipleCoincidence(my_abacus);
+<span class="keyword">if</span> text~=<span class="string">""</span>
+    disp([<span class="string">' Current multiple coincidence setting: '</span>,text]);
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Query each setting by separate:
+ Current delay in A: 0ns
+ Current delay in B: 20ns
+ Current sleep in A: 0ns
+ Current sleep in B: 20ns
+ Current coincidence window: 100ns
+ Current sampling: 2000ms
+ Current multiple coincidence setting: ABC
+</pre><h2 id="7">Write device settings</h2><p>Examples of writing a new setting value</p><pre class="codeinput">disp(<span class="string">'**********************'</span>)
+disp(<span class="string">'3. Write device settings'</span>)
+</pre><pre class="codeoutput">**********************
+3. Write device settings
+</pre><p>Set sampling time = 2000ms = 2s</p><pre class="codeinput">configureSamplingTime(my_abacus,2000);    <span class="comment">%set sampling=2000ms</span>
+value = querySamplingTime(my_abacus);
+disp([<span class="string">' Current sampling:'</span>,int2str(value),<span class="string">'ms'</span>]);
+</pre><pre class="codeoutput"> Current sampling:2000ms
+</pre><p>Set delay in channel B = 20ns</p><pre class="codeinput">configureDelay(my_abacus,<span class="string">'B'</span>,20);    <span class="comment">%set delay_B=20ns</span>
+value = queryDelay(my_abacus,<span class="string">'B'</span>);
+disp([<span class="string">' Current delay B:'</span>,int2str(value),<span class="string">'ns'</span>]);
+</pre><pre class="codeoutput"> Current delay B:20ns
+</pre><p>Set coincidence window = 100ns</p><pre class="codeinput">configureCoincidenceWindow(my_abacus,100);    <span class="comment">%set coinc_wind=100ns</span>
+value = queryCoincidenceWindow(my_abacus);
+disp([<span class="string">' Current coincidence window:'</span>,int2str(value),<span class="string">'ns'</span>]);
+</pre><pre class="codeoutput"> Current coincidence window:100ns
+</pre><h2 id="11">Read measurements from device</h2><pre class="codeinput">disp(<span class="string">'**********************'</span>)
+disp(<span class="string">'4. Read measurements from device'</span>)
+disp(<span class="string">'Waiting to complete a measurement:'</span>);
+waitForAcquisitionComplete(my_abacus,true);   <span class="comment">%using default max_wait=10 seconds, printing messages</span>
+disp(<span class="string">'Waiting to complete a measurement with a maxtime (1s) shorter than sampling time (2s):'</span>);
+waitForAcquisitionComplete(my_abacus,false,1); <span class="comment">%using max_wait=1second, no printing messages</span>
+</pre><pre class="codeoutput">**********************
+4. Read measurements from device
+Waiting to complete a measurement:
+Current ID is 129
+Next data is available in   2.0s
+Now, current ID is 130
+Waiting to complete a measurement with a maxtime (1s) shorter than sampling time (2s):
+Warning: Maxwait expired. Consider
+extending your maxwait. 
+</pre><p>Read data from device</p><pre class="codeinput">disp(<span class="string">'Measurements read from device, using readMeasurement function:'</span>);
+[my_meas_data,my_meas_labels]=readMeasurement(my_abacus);
+current_measurements=[my_meas_labels,my_meas_data];
+disp(current_measurements);
+</pre><pre class="codeoutput">Measurements read from device, using readMeasurement function:
+    "counters_ID"           "130"
+    "counter_A"             "0"  
+    "counter_B"             "0"  
+    "counter_C"             "0"  
+    "counter_D"             "0"  
+    "counter_AB"            "0"  
+    "counter_AC"            "0"  
+    "counter_AD"            "0"  
+    "counter_BC"            "0"  
+    "counter_BD"            "0"  
+    "counter_CD"            "0"  
+    "counter_multiple_1"    "0"  
+    "time_left"             "909"
+
+</pre><h2 id="13">Multiple coincidence setting and reading</h2><pre class="codeinput">text=queryMultipleCoincidence(my_abacus);
+<span class="keyword">if</span> text~=<span class="string">""</span>
+    disp(<span class="string">'*************************'</span>)
+    disp(<span class="string">'5. Multiple coincidence setting and reading'</span>)
+    <span class="comment">%if using a device able to measure multiple coincidences</span>
+    disp([<span class="string">' Current multiple coincidence setting: '</span>,text]);
+    configureMultipleCoincidence(my_abacus,<span class="string">'ABC'</span>);
+    text=queryMultipleCoincidence(my_abacus);
+    disp([<span class="string">' New multiple coincidence setting: '</span>,text]);
+    waitForAcquisitionComplete(my_abacus);   <span class="comment">%using default max_wait=10 seconds</span>
+    [my_meas_data,my_meas_labels]=readMeasurement(my_abacus);
+    my_index = find(my_meas_labels==<span class="string">'counter_multiple_1'</span>,1);
+    <span class="keyword">if</span> ~isempty(my_index)
+        value = my_meas_data(my_index);
+        disp([<span class="string">' Current coincidences in ABC: '</span>,int2str(value)]);
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">*************************
+5. Multiple coincidence setting and reading
+ Current multiple coincidence setting: ABC
+ New multiple coincidence setting: ABC
+ Current coincidences in ABC: 0
+</pre><h2 id="14">Close connection</h2><pre class="codeinput">closeAbacus(my_abacus)
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Tausand AB1000 Matlab library example: Abacus Example
+% A set of basic commands to test Tausand_AB1000_MatlabLibrary
+% to be used in Matlab's command window
+%
+% Author: David Guzman.
+% Tausand Electronics, Colombia.
+% March 2021; Last update: 15-Mar-2021.
+%
+% Contact email: dguzman@tausand.com. 
+% Website: http://www.tausand.com
+
+%% Find devices and establish a connection
+disp('*********************');
+disp('MATLAB Abacus example');
+disp('*********************');
+disp('1.  Find devices and establish a connection');
+%%
+% Find Tausand Abacus devices with reference AB1504.
+disp('1a.  Find Tausand Abacus devices with reference AB1504');
+[ports,n] = findDevices(1504); %1504: look for only 1504 devices
+disp(['Found ',int2str(n),' device(s) with reference 1504']);
+%%
+% Find Tausand Abacus devices with any reference.
+disp('1b.  Find Tausand Abacus devices with any reference');
+[ports,n] = findDevices(); %(): any device
+disp(['Found ',int2str(n),' device(s) with any reference']);
+
+if n==0
+    disp('No valid devices were found. Closing.');
+    return
+end
+
+disp('Available valid devices:');
+ports
+
+%%
+% Connect to the first device found.
+disp('Select the first found device to connect with.');
+my_device_port = ports{1}
+my_abacus = openAbacus(my_device_port)
+
+disp('Connected to the following device:');
+myidnstring = idnQuery(my_abacus);
+mydevicetype = deviceTypeQuery(my_abacus);
+disp(['idn (string): ',char(9),char(9),char(9),myidnstring]);
+disp(['device type (integer): ',char(9),int2str(mydevicetype)]);
+
+%% Read device settings
+% Example of reading all device settings
+disp("********************")
+disp("2. Read device settings")
+disp('Settings read from device, using queryAllSettings function:');
+[my_sett_data,my_sett_labels]=queryAllSettings(my_abacus);
+current_settings=[my_sett_labels,my_sett_data];
+disp(current_settings);
+
+%%
+% Examples reading single settings
+disp('Query each setting by separate:');
+value=queryDelay(my_abacus,'A');
+disp([' Current delay in A: ',int2str(value),'ns']);
+value=queryDelay(my_abacus,'B');
+disp([' Current delay in B: ',int2str(value),'ns']);
+value=querySleep(my_abacus,'A');
+disp([' Current sleep in A: ',int2str(value),'ns']);
+value=querySleep(my_abacus,'B');
+disp([' Current sleep in B: ',int2str(value),'ns']);
+value=queryCoincidenceWindow(my_abacus);
+disp([' Current coincidence window: ',int2str(value),'ns']);
+value=querySamplingTime(my_abacus);
+disp([' Current sampling: ',int2str(value),'ms']);
+text=queryMultipleCoincidence(my_abacus);
+if text~=""
+    disp([' Current multiple coincidence setting: ',text]);
+end
+
+%% Write device settings
+% Examples of writing a new setting value
+disp('**********************')
+disp('3. Write device settings')
+%% 
+% Set sampling time = 2000ms = 2s
+configureSamplingTime(my_abacus,2000);    %set sampling=2000ms
+value = querySamplingTime(my_abacus);
+disp([' Current sampling:',int2str(value),'ms']);
+%% 
+% Set delay in channel B = 20ns
+configureDelay(my_abacus,'B',20);    %set delay_B=20ns
+value = queryDelay(my_abacus,'B');
+disp([' Current delay B:',int2str(value),'ns']);
+%% 
+% Set coincidence window = 100ns
+configureCoincidenceWindow(my_abacus,100);    %set coinc_wind=100ns
+value = queryCoincidenceWindow(my_abacus);
+disp([' Current coincidence window:',int2str(value),'ns']);
+
+%% Read measurements from device
+disp('**********************')
+disp('4. Read measurements from device')
+disp('Waiting to complete a measurement:');
+waitForAcquisitionComplete(my_abacus,true);   %using default max_wait=10 seconds, printing messages
+disp('Waiting to complete a measurement with a maxtime (1s) shorter than sampling time (2s):');
+waitForAcquisitionComplete(my_abacus,false,1); %using max_wait=1second, no printing messages
+%%
+% Read data from device
+disp('Measurements read from device, using readMeasurement function:');
+[my_meas_data,my_meas_labels]=readMeasurement(my_abacus);
+current_measurements=[my_meas_labels,my_meas_data];
+disp(current_measurements);
+
+%% Multiple coincidence setting and reading
+text=queryMultipleCoincidence(my_abacus);
+if text~=""
+    disp('*************************')
+    disp('5. Multiple coincidence setting and reading')
+    %if using a device able to measure multiple coincidences
+    disp([' Current multiple coincidence setting: ',text]);
+    configureMultipleCoincidence(my_abacus,'ABC');
+    text=queryMultipleCoincidence(my_abacus);
+    disp([' New multiple coincidence setting: ',text]);
+    waitForAcquisitionComplete(my_abacus);   %using default max_wait=10 seconds
+    [my_meas_data,my_meas_labels]=readMeasurement(my_abacus);
+    my_index = find(my_meas_labels=='counter_multiple_1',1);
+    if ~isempty(my_index)
+        value = my_meas_data(my_index);
+        disp([' Current coincidences in ABC: ',int2str(value)]);
+    end
+end
+
+%% Close connection
+closeAbacus(my_abacus)
+##### SOURCE END #####
+--></body></html>

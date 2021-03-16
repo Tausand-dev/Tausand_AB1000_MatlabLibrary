@@ -48,11 +48,13 @@ function [ data_out, labels_out ] = waitAndGetValues( abacus_object, channels, p
 %
 %   See also READMEASUREMENT, WAITFORACQUISITIONCOMPLETE.
 
-% Author: David Guzman
-% Tausand Electronics, Colombia
-% email: dguzman@tausand.com
+% Author: David Guzmán.
+% Tausand Electronics, Colombia.
+%
+% Created: 2021-03. Last revision: 2021-03-16. Version: 1.1.
+%
+% Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com
-% March 2021; Last revision: 15-Mar-2021
 
     %% 1. Validate inputs
     if ~isa(abacus_object,'serial')
@@ -127,13 +129,15 @@ function [ data_out, labels_out ] = waitAndGetValues( abacus_object, channels, p
         warning('off','TAUSAND:timeout');   %turn off timeout warnings. If so, a retry will be done anyway.
     end
     for attempt=1:max_try
+        all_data = [];
+        all_labels = [];
         try
             [ all_data, all_labels ] = readMeasurement( abacus_object );
             if ~isempty(all_data) %if data read ok
                 break;  %force end for loop
             end
         catch ME
-            switch ME.identifier
+            switch ME.identifier                
                 case 'MATLAB:serial:fwrite:opfailed'
                     closeAbacus(abacus_object)
                     try

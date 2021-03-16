@@ -67,4 +67,4 @@ Original release.
 
 * REV 1.1, 16/03/2021<br/>
 Updated by: David Guzmán, dguzman@tausand.com, Bogota, Colombia.<br/>
-Added support for 4-input devices. New examples included. New function waitAndGetValues to ease continuous acquisitions.
+Added support for 2ns and 1ns devices. New examples included. New function waitAndGetValues to ease continuous acquisitions.

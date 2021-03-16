@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Tausand AB1000 Matlab library tester</h1><p>A set of commands to test Tausand_AB1000_MatlabLibrary to be used in Matlab's command window</p><p>Author: David Guzman. Tausand Electronics, Colombia. September 2020; Last update: 15-Mar-2021</p><p>Contact email: <a href="mailto:dguzman@tausand.com">dguzman@tausand.com</a>. Website: <a href="http://www.tausand.com">http://www.tausand.com</a></p><pre class="codeinput">findDevices(1504)   <span class="comment">%searches for Tausand Abacus AB1504 devices</span>
+  </style></head><body><div class="content"><h1>Tausand AB1000 Matlab library tester</h1><p>A set of commands to test Tausand_AB1000_MatlabLibrary to be used in Matlab's command window</p><p>Author: David Guzm&aacute;n. Tausand Electronics, Colombia.</p><p>Created: 2020-09. Last revision: 2021-03-15. Version: 1.1.</p><p>Contact email: <a href="mailto:dguzman@tausand.com">dguzman@tausand.com</a>. Website: <a href="http://www.tausand.com">http://www.tausand.com</a></p><pre class="codeinput">findDevices(1504)   <span class="comment">%searches for Tausand Abacus AB1504 devices</span>
 findDevices()      <span class="comment">%searches for any device of the Tausand Abacus family</span>
 my_ports=findDevices()      <span class="comment">%searches for any device of the Tausand Abacus family</span>
 <span class="comment">%my_abacus=openAbacus('COM28'); %change COM port depending on your results of 'findDevices'</span>
@@ -170,29 +170,18 @@ ans =
 
   uint32
 
-   0
+   3
 
 
 ans =
 
     'Tausand Abacus AB1504'
 
+Warning: Timeout in function queryAllSettings. 
 
 ans =
 
-  11&times;1 uint32 column vector
-
-   560
-   130
-    10
-    20
-    36
-     0
-    36
-    50
-     0
-     0
-   208
+     []
 
 
 my_sett_data =
@@ -254,29 +243,18 @@ ans =
 
    560
 
+Warning: Timeout in function queryAllSettings. 
 
 ans =
 
-  11&times;1 uint32 column vector
-
-   560
-   130
-    10
-    20
-    36
-     0
-    36
-    50
-     0
-     0
-   208
+     []
 
 
 ans =
 
   13&times;1 uint32 column vector
 
-    1
+    2
     0
     0
     0
@@ -288,26 +266,26 @@ ans =
     0
     0
     0
-   29
+   97
 
 
 my_meas_data =
 
   13&times;1 uint32 column vector
 
-     2
-     0
-     0
-     0
-     0
-     0
-     0
-     0
-     0
-     0
-     0
-     0
-   509
+    2
+    0
+    0
+    0
+    0
+    0
+    0
+    0
+    0
+    0
+    0
+    0
+   31
 
 
 my_meas_labels = 
@@ -333,7 +311,7 @@ ans =
 
   uint32
 
-   459
+   551
 
 
 ans =
@@ -342,8 +320,8 @@ ans =
 
    5000
 
-Current ID is 3
-Next data is available in   5.0s
+Current ID is 0
+Next data is available in   0.0s
 Now, current ID is 1
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
 ##### SOURCE BEGIN #####
@@ -351,13 +329,13 @@ Now, current ID is 1
 % A set of commands to test Tausand_AB1000_MatlabLibrary
 % to be used in Matlab's command window
 %
-% Author: David Guzman.
+% Author: David Guzmán.
 % Tausand Electronics, Colombia.
-% September 2020; Last update: 15-Mar-2021
+%
+% Created: 2020-09. Last revision: 2021-03-15. Version: 1.1.
 %
 % Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com
-%
 
 findDevices(1504)   %searches for Tausand Abacus AB1504 devices
 findDevices()      %searches for any device of the Tausand Abacus family

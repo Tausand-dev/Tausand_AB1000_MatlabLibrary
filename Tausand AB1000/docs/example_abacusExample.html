@@ -66,7 +66,7 @@ table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px soli
 
 
 
-  </style></head><body><div class="content"><h1>Tausand AB1000 Matlab library example: Abacus Example</h1><!--introduction--><p>A set of basic commands to test Tausand_AB1000_MatlabLibrary to be used in Matlab's command window</p><p>Author: David Guzman. Tausand Electronics, Colombia. March 2021; Last update: 15-Mar-2021.</p><p>Contact email: <a href="mailto:dguzman@tausand.com">dguzman@tausand.com</a>. Website: <a href="http://www.tausand.com">http://www.tausand.com</a></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Find devices and establish a connection</a></li><li><a href="#5">Read device settings</a></li><li><a href="#7">Write device settings</a></li><li><a href="#11">Read measurements from device</a></li><li><a href="#13">Multiple coincidence setting and reading</a></li><li><a href="#14">Close connection</a></li></ul></div><h2 id="1">Find devices and establish a connection</h2><pre class="codeinput">disp(<span class="string">'*********************'</span>);
+  </style></head><body><div class="content"><h1>Tausand AB1000 Matlab library example: Abacus Example</h1><!--introduction--><p>A set of basic commands to test Tausand_AB1000_MatlabLibrary to be used in Matlab's command window.</p><p>Author: David Guzm&aacute;n. Tausand Electronics, Colombia.</p><p>Created: 2021-03. Last revision: 2021-03-15. Version: 1.1.</p><p>Contact email: <a href="mailto:dguzman@tausand.com">dguzman@tausand.com</a>. Website: <a href="http://www.tausand.com">http://www.tausand.com</a></p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Find devices and establish a connection</a></li><li><a href="#5">Read device settings</a></li><li><a href="#7">Write device settings</a></li><li><a href="#11">Read measurements from device</a></li><li><a href="#13">Multiple coincidence setting and reading</a></li><li><a href="#14">Close connection</a></li></ul></div><h2 id="1">Find devices and establish a connection</h2><pre class="codeinput">disp(<span class="string">'*********************'</span>);
 disp(<span class="string">'MATLAB Abacus example'</span>);
 disp(<span class="string">'*********************'</span>);
 disp(<span class="string">'1.  Find devices and establish a connection'</span>);
@@ -148,18 +148,7 @@ disp(current_settings);
 </pre><pre class="codeoutput">********************
 2. Read device settings
 Settings read from device, using queryAllSettings function:
-    "sampling"              "2000"
-    "coincidence_window"    "100" 
-    "delay_A"               "0"   
-    "delay_B"               "20"  
-    "delay_C"               "0"   
-    "delay_D"               "0"   
-    "sleep_A"               "0"   
-    "sleep_B"               "20"  
-    "sleep_C"               "0"   
-    "sleep_D"               "0"   
-    "config_multiple_1"     "224" 
-
+Warning: Timeout in function queryAllSettings. 
 </pre><p>Examples reading single settings</p><pre class="codeinput">disp(<span class="string">'Query each setting by separate:'</span>);
 value=queryDelay(my_abacus,<span class="string">'A'</span>);
 disp([<span class="string">' Current delay in A: '</span>,int2str(value),<span class="string">'ns'</span>]);
@@ -210,18 +199,18 @@ waitForAcquisitionComplete(my_abacus,false,1); <span class="comment">%using max_
 </pre><pre class="codeoutput">**********************
 4. Read measurements from device
 Waiting to complete a measurement:
-Current ID is 129
-Next data is available in   2.0s
-Now, current ID is 130
+Current ID is 16
+Next data is available in   0.0s
+Now, current ID is 17
 Waiting to complete a measurement with a maxtime (1s) shorter than sampling time (2s):
-Warning: Maxwait expired. Consider
-extending your maxwait. 
+Warning: Maxwait expired. Consider extending
+your maxwait. 
 </pre><p>Read data from device</p><pre class="codeinput">disp(<span class="string">'Measurements read from device, using readMeasurement function:'</span>);
 [my_meas_data,my_meas_labels]=readMeasurement(my_abacus);
 current_measurements=[my_meas_labels,my_meas_data];
 disp(current_measurements);
 </pre><pre class="codeoutput">Measurements read from device, using readMeasurement function:
-    "counters_ID"           "130"
+    "counters_ID"           "17" 
     "counter_A"             "0"  
     "counter_B"             "0"  
     "counter_C"             "0"  
@@ -233,7 +222,7 @@ disp(current_measurements);
     "counter_BD"            "0"  
     "counter_CD"            "0"  
     "counter_multiple_1"    "0"  
-    "time_left"             "909"
+    "time_left"             "777"
 
 </pre><h2 id="13">Multiple coincidence setting and reading</h2><pre class="codeinput">text=queryMultipleCoincidence(my_abacus);
 <span class="keyword">if</span> text~=<span class="string">""</span>
@@ -256,17 +245,23 @@ disp(current_measurements);
 5. Multiple coincidence setting and reading
  Current multiple coincidence setting: ABC
  New multiple coincidence setting: ABC
- Current coincidences in ABC: 0
+Warning: Timeout in function readMeasurement. 
+</pre><pre class="codeoutput error">Error using ==
+Matrix dimensions must agree.
+
+Error in example_abacusExample (line 124)
+    my_index = find(my_meas_labels=='counter_multiple_1',1);
 </pre><h2 id="14">Close connection</h2><pre class="codeinput">closeAbacus(my_abacus)
 </pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2017a</a><br></p></div><!--
 ##### SOURCE BEGIN #####
 %% Tausand AB1000 Matlab library example: Abacus Example
 % A set of basic commands to test Tausand_AB1000_MatlabLibrary
-% to be used in Matlab's command window
+% to be used in Matlab's command window.
 %
-% Author: David Guzman.
+% Author: David Guzmán.
 % Tausand Electronics, Colombia.
-% March 2021; Last update: 15-Mar-2021.
+%
+% Created: 2021-03. Last revision: 2021-03-15. Version: 1.1.
 %
 % Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com

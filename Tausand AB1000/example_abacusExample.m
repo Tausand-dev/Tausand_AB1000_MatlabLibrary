@@ -1,10 +1,11 @@
 %% Tausand AB1000 Matlab library example: Abacus Example
 % A set of basic commands to test Tausand_AB1000_MatlabLibrary
-% to be used in Matlab's command window
+% to be used in Matlab's command window.
 %
-% Author: David Guzman.
+% Author: David Guzmán.
 % Tausand Electronics, Colombia.
-% March 2021; Last update: 15-Mar-2021.
+%
+% Created: 2021-03. Last revision: 2021-03-15. Version: 1.1.
 %
 % Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com

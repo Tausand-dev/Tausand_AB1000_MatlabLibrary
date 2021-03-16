@@ -32,14 +32,15 @@ function [ data_out, labels_out ] = readMeasurement( abacus_object )
 %
 %   See also QUERYALLSETTINGS, WAITANDGETVALUES.
 
-% Author: David Guzman
-% Tausand Electronics, Colombia
-% email: dguzman@tausand.com
+% Author: David Guzmán.
+% Tausand Electronics, Colombia.
+%
+% Created: 2019-05. Last revision: 2021-03-16. Version: 1.1.
+%
+% v1.1. 2020-09. Includes new devices AB1502, AB1504, AB1902 and AB1904.
+%       2021-03. Returns unsigned integer.
+% Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com
-% May 2019; Last update: 15-Mar-2021
-% v1.1 September 2020. Includes new devices AB1502, AB1504, AB1902 and 
-%      AB1904. Tested on AB1504.
-%      March 2021. Returns integer (uint32) values.
 
 % Some timing measurements:
 %   In a AB1504, to read the set of 83 bytes, the timer tElapsed = 0.035s
@@ -72,38 +73,18 @@ C2Pow24=16777216;   %2^24
 %% Get device type
 [~,is32bitdevice]=getDeviceTypeFromName(abacus_object);
 
-% serial_name = get(abacus_object,'Name');
-% if contains(serial_name,"AB1004")
-%     device_type=1004;
-% elseif contains(serial_name,"AB1002")
-%     device_type=1002;
-% else
-%     device_type=DeviceTypeQuery(abacus_object);
-%     if (device_type ~= 1002) && (device_type ~= 1004)
-%         disp('Unknown device type')
-%         return
-%     end
-% end
-
-
 %% Read request and wait for data available in port
 
-
 if is32bitdevice %if device_type == 1004, 1504 or 1904
-    expectedBytes = 83;
+    expectedBytes = 83; %5*(4+3+2+1+2+1)values + 6(2prefix + 1chechsum)
+    address=[0,9,18,27,83,96];
+    data_value=[4,3,2,1,2,1];
+    av=[address;data_value];
 else%if device_type == 1002, 1502 or 1902
     expectedBytes = 18; %3*5 values + 2 prefix + 1 checksum
+    %address=24;
+    %data_value=8;
 end
-% %old version 1.0
-% if device_type == 1002
-%     expectedBytes = 18; %3*5 values + 2 prefix + 1 checksum
-% else%if device_type == 1004
-%     expectedBytes = 83;
-% end
-
-address=[0,9,18,27,83,96];
-data_value=[4,3,2,1,2,1];
-av=[address;data_value];
 
 repeatRdWr = 1;
 while repeatRdWr == 1
@@ -117,16 +98,7 @@ while repeatRdWr == 1
         else%if device_type == 1002, 1502 or 1902
             writeSerial(abacus_object,'read',24,8); % send command to Abacus
         end
-%         %old version 1.0
-%         if device_type == 1002
-%             writeSerial(abacus_object,'read',24,8); % send command to Abacus
-%         else%if device_type == 1004
-%             for k=av
-%                 writeSerial32(abacus_object,'read',k(1),k(2)); % send 6 commands to Abacus
-%             end
-%         end
 
-        %waitForBytes(abacus_object,expectedBytes,localmaxtimeout);
         waitForBytes(abacus_object,expectedBytes,singlereadtimeout); %v1.1 always wait up to singlereadtimeout
         
         tElapsedLocalReadMeasurement = toc(tStartLocalReadMeasurement);
@@ -143,9 +115,6 @@ while repeatRdWr == 1
             repeatWr=0;
         end
 
-%       % %old version 1.0
-%       %localmaxtimeout = localmaxtimeout + (maxtimeout/numtries);
-
     end
 
     %% Read data available in port
@@ -154,17 +123,10 @@ while repeatRdWr == 1
     cumNumBytes = 0;
     
     if is32bitdevice %if device_type == 1004, 1504 or 1904
-        numReads=6;
+        numReads=6; %length(address) = 6
     else%if device_type == 1002, 1502 or 1902
         numReads=1;
     end
-%     %old version 1.0
-%     if device_type == 1002
-%         numReads=1;
-%     else%if device_type == 1004
-%         numReads=6;
-%     end
-
     
     for i=1:numReads
         tElapsedLocalReadMeasurement = toc(tStartLocalReadMeasurement);
@@ -172,8 +134,7 @@ while repeatRdWr == 1
             warning('TAUSAND:timeout','Timeout in function readMeasurement.')
             return
         end 
-        %numReads %testing
-        %i %testing
+
         bytesavail = abacus_object.BytesAvailable;
         tByteStart = tic;
         tByteEnd = 0;
@@ -244,12 +205,6 @@ while repeatRdWr == 1
     else%if device_type == 1002, 1502 or 1902
         readDatastream=reshape(readDatastream,3,cumNumBytes/3); %1-byte address + 2-bytes value
     end
-%     %old version 1.0
-%     if device_type == 1002
-%         readDatastream=reshape(readDatastream,3,cumNumBytes/3); %1-byte address + 2-bytes value
-%     else%if device_type == 1004
-%         readDatastream=reshape(readDatastream,5,cumNumBytes/5);%1-byte address + 4-bytes value
-%     end
     addresses_out=readDatastream(1,:)';
     data_out=readDatastream(2:end,:)';
 
@@ -273,14 +228,6 @@ while repeatRdWr == 1
         data_out=data_out(:,1)*C2Pow8+data_out(:,2); %first byte * 2^8 + second byte
         addresses_ok=isequal(sort(addresses_out)',24:31);
     end
-%     %old version 1.0
-%     if device_type == 1004
-%         data_out=data_out(:,1)*C2Pow24+data_out(:,2)*C2Pow16+data_out(:,3)*C2Pow8+data_out(:,4);
-%         addresses_ok=isequal(sort(addresses_out),[0;1;2;3;9;10;11;18;19;27;83;84;96]);
-%     else%if device_type == 1002
-%         data_out=data_out(:,1)*C2Pow8+data_out(:,2); %first byte * 2^8 + second byte
-%         addresses_ok=isequal(sort(addresses_out)',24:31);
-%     end
     %toc
 
     tElapsedLocalReadMeasurement = toc(tStartLocalReadMeasurement);
@@ -292,7 +239,7 @@ while repeatRdWr == 1
         warning('TAUSAND:timeout','Timeout in function readMeasurement.')
         return
     end
-    %tElapsedLocal %testing
+    %tElapsedLocalReadMeasurement %testing
     
 end
 
@@ -308,17 +255,6 @@ else%if device_type == 1002, 1502 or 1902
         "counter_AB";"time_left"];
 end
 
-% %old version 1.0
-% if device_type == 1002
-%     labelArray=["counters_ID";"counter_A";"counter_B";
-%         "counter_AB";"time_left"];
-% else
-%     labelArray=["counters_ID";"counter_A";"counter_B";"counter_C";"counter_D";
-%         "counter_AB";"counter_AC";"counter_AD";"counter_BC";"counter_BD";"counter_CD";
-%         "counter_multiple_1";
-%         "time_left"];
-% end
-
 data_out_2=zeros(length(labelArray),1);
 
 if is32bitdevice %if device_type == 1004, 1504 or 1904
@@ -332,7 +268,6 @@ if is32bitdevice %if device_type == 1004, 1504 or 1904
     data_out_2(8,1)=data_out(addresses_out==3); %counter_AD
     data_out_2(9,1)=data_out(addresses_out==10); %counter_BC
     data_out_2(10,1)=data_out(addresses_out==11); %counter_BD
-    data_out_2(11,1)=data_out(addresses_out==19); %counter_CD
     data_out_2(11,1)=data_out(addresses_out==19); %counter_CD
     data_out_2(12,1)=data_out(addresses_out==96); %counter_multiple_1
     data_out_2(13,1)=data_out(addresses_out==84); %time_left
@@ -370,102 +305,7 @@ else%if device_type == 1002, 1502 or 1902
 
 end
 
-% %old version 1.0
-% if device_type == 1002
-%     % Method 1: prefixed addresses. Takes less than 0.1ms to run
-%     data_out_2(1,1)=data_out(addresses_out==30); %counters_ID
-%     data_out_2(2,1)=data_out(addresses_out==24)+data_out(addresses_out==25)*65536; %counters_A
-%     data_out_2(3,1)=data_out(addresses_out==26)+data_out(addresses_out==27)*65536; %counters_B
-%     data_out_2(4,1)=data_out(addresses_out==28)+data_out(addresses_out==29)*65536; %counters_AB
-%     data_out_2(5,1)=data_out(addresses_out==31); %time_left
-%     
-%     %special case for time_left in AB1002
-%     %if first bit is '1', indicates the remaining bits have the value in seconds
-%     if data_out_2(5,1) >= 32768
-%         data_out_2(5,1) = (data_out_2(5,1)-32768)*1000;
-%     end
-% 
-%     % % Method 2: dynamic address search. Takes about 1ms to run
-%     % k=1;
-%     % for a=labelArray'
-%     %     %beware: first address in abacus is 0, first index in Matlab is 1
-%     %     if contains(a,'counter_')
-%     %         aux_addr = find(ADDRESS_DIR_AB1002 == strcat(a,"_MSB")) - 1; %first address in Abacus is 0
-%     %         aux_data = data_out(addresses_out==aux_addr)*65536; %times 2^16
-%     %         aux_addr = find(ADDRESS_DIR_AB1002 == strcat(a,"_LSB")) - 1; %first address in Abacus is 0
-%     %         aux_data = aux_data+data_out(addresses_out==aux_addr);
-%     %     else
-%     %         aux_addr = find(ADDRESS_DIR_AB1002 == a) - 1;
-%     %         aux_data = data_out(addresses_out==aux_addr);
-%     %     end
-%     %     data_out_2(k,1) = aux_data;
-%     %     k=k+1;
-%     % end
-% else %if device_type == 1004
-%     data_out_2(1,1)=data_out(addresses_out==83); %counters_ID  
-%     data_out_2(2,1)=data_out(addresses_out==0); %counter_A
-%     data_out_2(3,1)=data_out(addresses_out==9); %counter_B
-%     data_out_2(4,1)=data_out(addresses_out==18); %counter_C
-%     data_out_2(5,1)=data_out(addresses_out==27); %counter_D
-%     data_out_2(6,1)=data_out(addresses_out==1); %counter_AB
-%     data_out_2(7,1)=data_out(addresses_out==2); %counter_AC
-%     data_out_2(8,1)=data_out(addresses_out==3); %counter_AD
-%     data_out_2(9,1)=data_out(addresses_out==10); %counter_BC
-%     data_out_2(10,1)=data_out(addresses_out==11); %counter_BD
-%     data_out_2(11,1)=data_out(addresses_out==19); %counter_CD
-%     data_out_2(11,1)=data_out(addresses_out==19); %counter_CD
-%     data_out_2(12,1)=data_out(addresses_out==96); %counter_multiple_1
-%     data_out_2(13,1)=data_out(addresses_out==84); %time_left
-% end
-
 data_out=uint32(data_out_2); %2021-03: returns unsigned integer array
 labels_out = labelArray;
 
 end
-
-
-% function clearBuffer(abacus_object)
-%     bytesInPort = abacus_object.BytesAvailable;
-%     if bytesInPort > 0
-%         fread(abacus_object,bytesInPort); %clear buffer if any
-%         %disp('Buffer cleared')
-%     end
-% end
-
-% function writeSerial(abacus_object,command,address,value)
-%     if command == 'read'
-%         valCommand = 14;
-%     elseif command == 'write'
-%         valCommand = 15;
-%     else
-%         valCommand = 0;
-%     end
-%     aux=typecast(uint16(value),'uint8');
-%     dataMsb=aux(2);
-%     dataLsb=aux(1);
-%     word16=[2,valCommand,address,dataMsb,dataLsb,4];
-%     fwrite(abacus_object,word16);
-% end
-
-% function writeSerial32(abacus_object,command,address,value)
-%     if command == 'read'
-%         valCommand = 14;
-%     elseif command == 'write'
-%         valCommand = 15;
-%     else
-%         valCommand = 0;
-%     end
-%     aux=typecast(uint32(value),'uint8');
-%     dataMsb=aux(4);
-%     data2ndMsb=aux(3);
-%     data2ndLsb=aux(2);
-%     dataLsb=aux(1);
-%     word32=[2,valCommand,address,dataMsb,data2ndMsb,data2ndLsb,dataLsb,4];
-%     fwrite(abacus_object,word32);
-% end
-
-% function waitForBytes(abacus_object,expectedBytes,timeout)
-%     while (abacus_object.BytesAvailable < expectedBytes) && (toc < timeout)
-%         %waits until all bytes are available or a timeout happens
-%     end
-% end

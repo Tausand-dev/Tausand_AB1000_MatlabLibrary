@@ -17,12 +17,15 @@ function [ value_ms ] = configureSamplingTime( abacus_object , value_ms )
 %
 %   See also QUERYSAMPLINGTIME.
 
-% Author: David Guzman
-% Tausand Electronics, Colombia
-% email: dguzman@tausand.com
+% Author: David Guzmán.
+% Tausand Electronics, Colombia.
+%
+% Created: 2019-05. Last revision: 2021-03-15. Version: 1.1.
+%
+% v1.1. 2020-07. Includes new devices AB1502, AB1504, AB1902 and AB1904.
+%
+% Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com
-% May 2019; Last update: 14-Mar-2021
-% v1.1 July 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904.
 
 %% Input validation
 if ~isa(abacus_object,'serial')

@@ -19,13 +19,15 @@ function [ abacus_obj ] = openAbacus( port )
 %
 %   See also CLOSEABACUS.
 
-% Author: David Guzman
-% Tausand Electronics, Colombia
-% email: dguzman@tausand.com
+% Author: David Guzmán.
+% Tausand Electronics, Colombia.
+%
+% Created: 2019-05. Last revision: 2021-03-15. Version: 1.1.
+%
+% v1.1. 2020-09. Sets timeout=0.5s.
+%       2021-03. Single append of device reference "ABxxxx" in object name.
+% Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com
-% May 2019; Last revision: 15-Mar-2021
-% v1.1  September 2020. Sets timeout=0.5s.
-%       March 2021. Single append of device reference "ABxxxx" in object name
 
 %% Instrument Connection
 

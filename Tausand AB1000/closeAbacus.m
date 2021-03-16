@@ -14,11 +14,13 @@ function [ ] = closeAbacus( abacus_object )
 %
 %   See also OPENABACUS.
 
-% Author: David Guzman
-% Tausand Electronics, Colombia
-% email: dguzman@tausand.com
+% Author: David Guzmán.
+% Tausand Electronics, Colombia.
+%
+% Created: 2019-05. Last revision: 2021-03-15. Version: 1.1.
+%
+% Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com
-% May 2019; Last revision: 10-Mar-2021
 
 %% Input validation
 if ~isa(abacus_object,'serial')

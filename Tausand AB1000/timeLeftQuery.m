@@ -22,13 +22,15 @@ function [ time_left_ms ] = timeLeftQuery( abacus_object )
 %
 %   See also COUNTERSIDQUERY.
 
-% Author: David Guzman
-% Tausand Electronics, Colombia
-% email: dguzman@tausand.com
+% Author: David Guzmán.
+% Tausand Electronics, Colombia.
+%
+% Created: 2019-05. Last revision: 2021-03-15. Version: 1.1.
+%
+% v1.1. 2020-08. Includes new devices AB1502, AB1504, AB1902 and AB1904.
+%       2021-03. Returns unsigned integer.
+% Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com
-% May 2019; Last update: 10-Mar-2021
-% v1.1 August 2020. Includes new devices AB1502, AB1504, AB1902 and AB1904.
-%      March 2021. Returns unsigned integer.
 
 %% Input validation
 if ~isa(abacus_object,'serial')

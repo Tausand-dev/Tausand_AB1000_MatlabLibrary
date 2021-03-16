@@ -56,12 +56,15 @@ function [ config_string, config_value ] = configureMultipleCoincidence( abacus_
 %
 %   See also QUERYMULTIPLECOINCIDENCE, READMEASUREMENT.
 
-% Author: David Guzman
-% Tausand Electronics, Colombia
-% email: dguzman@tausand.com
+% Author: David Guzmán.
+% Tausand Electronics, Colombia.
+%
+% Created: 2019-05. Last revision: 2021-03-15. Version: 1.1.
+%
+% v1.1. 2020-07. Includes AB1504 and AB1904 as valid device types.
+%
+% Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com
-% May 2019; Last revision: 15-Mar-2021
-% v1.1 July 2020. Includes AB1504 and AB1904 as valid device types.
 
     %% Input validation
     if ~isa(abacus_object,'serial')

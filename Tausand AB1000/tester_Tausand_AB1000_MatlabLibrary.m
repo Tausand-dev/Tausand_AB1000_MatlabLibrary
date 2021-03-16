@@ -2,13 +2,13 @@
 % A set of commands to test Tausand_AB1000_MatlabLibrary
 % to be used in Matlab's command window
 %
-% Author: David Guzman.
+% Author: David Guzmán.
 % Tausand Electronics, Colombia.
-% September 2020; Last update: 15-Mar-2021
+%
+% Created: 2020-09. Last revision: 2021-03-15. Version: 1.1.
 %
 % Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com
-%
 
 findDevices(1504)   %searches for Tausand Abacus AB1504 devices
 findDevices()      %searches for any device of the Tausand Abacus family
@@ -20,7 +20,7 @@ configureByName(my_abacus,["sampling"],[2500]) %sets sampling to 2.5s
 configureChannel(my_abacus,'B',20,50) %sets delay to 20ns and sleep to 50ns, or the closest valid values
 configureChannel(my_abacus,'a',10,59) %sets delay to 10ns and sleep to 59ns, or the closest valid values
 configureCoincidenceWindow(my_abacus,133) %sets to 133ns, or the closest valid value
-configureDelay(my_abacus,'c',35) %sets to 35ms, or the closest valid value
+configureDelay(my_abacus,'a',35) %sets to 35ms, or the closest valid value
 configureSleep(my_abacus,'a',35) %sets to 35ms, or the closest valid value
 configureMultipleCoincidence(my_abacus,"ABD")
 configureSamplingTime(my_abacus,555) %sets to 555ms, or the closest valid value

@@ -37,13 +37,16 @@ function [ ports, count ] = findDevices( device_type )
 %
 %   See also CLOSEABACUS, DEVICETYPEQUERY, IDNQUERY, OPENABACUS.
 
-% Author: David Guzman
-% Tausand Electronics, Colombia
-% email: dguzman@tausand.com
+% Author: David Guzmán.
+% Tausand Electronics, Colombia.
+%
+% Created: 2019-05. Last revision: 2021-03-15. Version: 1.1.
+%
+% v1.1. 2020-07. Input 'device_type' is not mandatory.
+%                Warnings thrown by deviceTypeQuery are turned off.
+%
+% Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com
-% May 2019; Last revision: 15-Mar-2021
-%   v1.1 Input 'device_type' is not mandatory
-%        warnings thrown by deviceTypeQuery are turned off
 
 %% Input validation
 if nargin == 0

@@ -38,13 +38,15 @@ function [ ] = waitForAcquisitionComplete( abacus_object, print_on, maxwait_s, m
 %   See also COUNTERSIDQUERY, READMEASUREMENT, TIMELEFTQUERY,
 %   WAITANDGETVALUES.
 
-% Author: David Guzman
-% Tausand Electronics, Colombia
-% email: dguzman@tausand.com
+% Author: David Guzmán.
+% Tausand Electronics, Colombia.
+%
+% Created: 2019-05. Last revision: 2021-03-15. Version: 1.1.
+%
+% v1.1. 2021-03. Maxwait_s is an optional argument.
+%                Improved algorithm handling special scenarios.
+% Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com
-% May 2019; Last revision: 11-Mar-2021
-% v1.1: maxwait_s is an optional argument
-%       improved algorithm handling special scenarios
 
     %% Input validation
     if ~isa(abacus_object,'serial')

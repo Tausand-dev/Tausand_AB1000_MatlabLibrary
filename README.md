@@ -1,6 +1,8 @@
 # Tausand_AB1000_MatlabLibrary
 Library to use Tausand Abacus AB1000 devices with Matlab
 
+(v1.2 under development)
+
 ## About Tausand Abacus AB1000
 
 This is a family of coincidence counters, ideal to measure temporal correlations in particle detection and quantum optics experiments.

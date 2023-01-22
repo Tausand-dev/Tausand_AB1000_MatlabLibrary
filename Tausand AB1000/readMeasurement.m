@@ -35,8 +35,11 @@ function [ data_out, labels_out ] = readMeasurement( abacus_object )
 % Author: David Guzmán.
 % Tausand Electronics, Colombia.
 %
-% Created: 2019-05. Last revision: 2021-03-16. Version: 1.1.
+% Created: 2019-05. Last revision: 2023-01-22. Version: 1.2.
 %
+% v1.2. 2023-01. Validates number of channels to create labels.
+%                Includes new devices AB2002, AB2004, AB2502 and AB2504.
+%                Pauses 1ms until serial device sends a response.
 % v1.1. 2020-09. Includes new devices AB1502, AB1504, AB1902 and AB1904.
 %       2021-03. Returns unsigned integer.
 % Contact email: dguzman@tausand.com. 
@@ -71,36 +74,49 @@ C2Pow16=65536;      %2^16
 C2Pow24=16777216;   %2^24
 
 %% Get device type
-[~,is32bitdevice]=getDeviceTypeFromName(abacus_object);
+[~,is32bitdevice,num_channels]=getDeviceTypeFromName(abacus_object);
 
 %% Read request and wait for data available in port
 
-if is32bitdevice %if device_type == 1004, 1504 or 1904
-    expectedBytes = 83; %5*(4+3+2+1+2+1)values + 6(2prefix + 1chechsum)
+if is32bitdevice && (num_channels == 4)%when using a 4-channel device: 1004, 1504, 1904, 2004, 2504
+    expectedBytes = 83; %5*(4+3+2+1+2+1)values + 6*(2prefix + 1checksum)
     address=[0,9,18,27,83,96];
     data_value=[4,3,2,1,2,1];
     av=[address;data_value];
-else%if device_type == 1002, 1502 or 1902
+elseif is32bitdevice && (num_channels == 2)%v1.2: when using a 2-channel device of 32-bits: 2002, 2502
+    expectedBytes = 34; %5*(2+1+2)values + 3*(2prefix + 1checksum)
+    address=[0,9,83];
+    data_value=[2,1,2];
+    av=[address;data_value];
+else%when using a 2-channel device of 16-bits: 1002, 1502 or 1902
     expectedBytes = 18; %3*5 values + 2 prefix + 1 checksum
     %address=24;
     %data_value=8;
 end
 
+clearBuffer(abacus_object); %v1.2 clear buffer 
 repeatRdWr = 1;
 while repeatRdWr == 1
     repeatWr = 1;
     while repeatWr == 1
         clearBuffer(abacus_object); % clear buffer
-        if is32bitdevice %if device_type == 1004, 1504 or 1904
+        if is32bitdevice %if device_type == 1004, 1504, 1904, 2002, 2004, 2502 or 2504
             for k=av
-                writeSerial32(abacus_object,'read',k(1),k(2)); % send 6 commands to Abacus
+                %v1.2: writes a 'read' command, and waits until bytesAvailable 
+                %      changes before sending the next 'read' command, 
+                %      i.e. waits until serial device responds
+                prev_bytesAvailable = abacus_object.BytesAvailable; %new v1.2
+                writeSerial32(abacus_object,'read',k(1),k(2)); % send 6 or 3 commands to Abacus
+                while (abacus_object.BytesAvailable == prev_bytesAvailable) && (toc(tStartLocalReadMeasurement) < maxtimeout)
+                    pause(0.001) %v1.2: added 1ms pause. Without this pause, readMeasurment fails with higher probability
+                end
             end
         else%if device_type == 1002, 1502 or 1902
             writeSerial(abacus_object,'read',24,8); % send command to Abacus
         end
 
         waitForBytes(abacus_object,expectedBytes,singlereadtimeout); %v1.1 always wait up to singlereadtimeout
-        
+
         tElapsedLocalReadMeasurement = toc(tStartLocalReadMeasurement);
         if (abacus_object.BytesAvailable >= expectedBytes)
             repeatWr=0; %done ok
@@ -121,9 +137,8 @@ while repeatRdWr == 1
 
     readDatastream=[];
     cumNumBytes = 0;
-    
     if is32bitdevice %if device_type == 1004, 1504 or 1904
-        numReads=6; %length(address) = 6
+        numReads = length(address); %v1.2: 6 or 3, depending on num_channels
     else%if device_type == 1002, 1502 or 1902
         numReads=1;
     end
@@ -200,9 +215,9 @@ while repeatRdWr == 1
 
     %% Organize datastream
 
-    if is32bitdevice %if device_type == 1004, 1504 or 1904
+    if is32bitdevice %if 32-bit device: 1004, 1504, 1904, 2002, 2004, 2502 or 2504
         readDatastream=reshape(readDatastream,5,cumNumBytes/5);%1-byte address + 4-bytes value
-    else%if device_type == 1002, 1502 or 1902
+    else%if 16-bit device: 1002, 1502 or 1902
         readDatastream=reshape(readDatastream,3,cumNumBytes/3); %1-byte address + 2-bytes value
     end
     addresses_out=readDatastream(1,:)';
@@ -221,9 +236,13 @@ while repeatRdWr == 1
 
     % method 2 takes about 1ms
     %tic
-    if is32bitdevice %if device_type == 1004, 1504 or 1904
+    if is32bitdevice %when using 32-bit devices: 1004, 1504, 1904, 2002, 2004, 2502 or 2504
         data_out=data_out(:,1)*C2Pow24+data_out(:,2)*C2Pow16+data_out(:,3)*C2Pow8+data_out(:,4);
-        addresses_ok=isequal(sort(addresses_out),[0;1;2;3;9;10;11;18;19;27;83;84;96]);
+        if num_channels == 4 %when using 4-channel devices: 1004, 1504, 1904, 2004, 2504
+            addresses_ok=isequal(sort(addresses_out),[0;1;2;3;9;10;11;18;19;27;83;84;96]);
+        else %v1.2: when using 2-channel devices: 2002, 2502
+            addresses_ok=isequal(sort(addresses_out),[0;1;9;83;84]);
+        end
     else%if device_type == 1002, 1502 or 1902
         data_out=data_out(:,1)*C2Pow8+data_out(:,2); %first byte * 2^8 + second byte
         addresses_ok=isequal(sort(addresses_out)',24:31);
@@ -245,19 +264,19 @@ end
 
 %% Get and return labels and data from read datastream
 
-if is32bitdevice %if device_type == 1004, 1504 or 1904
+if num_channels >= 4 %if using a 4-channel device: 1004, 1504, 1904, 2004 or 2504
     labelArray=["counters_ID";"counter_A";"counter_B";"counter_C";"counter_D";
         "counter_AB";"counter_AC";"counter_AD";"counter_BC";"counter_BD";"counter_CD";
         "counter_multiple_1";
         "time_left"];
-else%if device_type == 1002, 1502 or 1902
+else %if using a 2-channel device: 1002, 1502, 1902 (16-bit), 2002 or 2502 (32-bit)
     labelArray=["counters_ID";"counter_A";"counter_B";
         "counter_AB";"time_left"];
 end
 
 data_out_2=zeros(length(labelArray),1);
 
-if is32bitdevice %if device_type == 1004, 1504 or 1904
+if (is32bitdevice) && (num_channels == 4) %if device_type == 1004, 1504 or 1904
     data_out_2(1,1)=data_out(addresses_out==83); %counters_ID  
     data_out_2(2,1)=data_out(addresses_out==0); %counter_A
     data_out_2(3,1)=data_out(addresses_out==9); %counter_B
@@ -271,7 +290,12 @@ if is32bitdevice %if device_type == 1004, 1504 or 1904
     data_out_2(11,1)=data_out(addresses_out==19); %counter_CD
     data_out_2(12,1)=data_out(addresses_out==96); %counter_multiple_1
     data_out_2(13,1)=data_out(addresses_out==84); %time_left
-
+elseif (is32bitdevice) && (num_channels == 2) %if device_type == 2002 or 2502
+    data_out_2(1,1)=data_out(addresses_out==83); %counters_ID
+    data_out_2(2,1)=data_out(addresses_out==0); %counter_A
+    data_out_2(3,1)=data_out(addresses_out==9); %counter_B
+    data_out_2(4,1)=data_out(addresses_out==1); %counter_AB
+    data_out_2(5,1)=data_out(addresses_out==84); %time_left
 else%if device_type == 1002, 1502 or 1902
     % Method 1: prefixed addresses. Takes less than 0.1ms to run
     data_out_2(1,1)=data_out(addresses_out==30); %counters_ID

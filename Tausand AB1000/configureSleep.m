@@ -25,8 +25,9 @@ function [ value_ns ] = configureSleep( abacus_object, channel_char, value_ns )
 % Author: David Guzmán.
 % Tausand Electronics, Colombia.
 %
-% Created: 2019-05. Last revision: 2021-03-15. Version: 1.1.
+% Created: 2019-05. Last revision: 2023-01-22. Version: 1.2.
 %
+% v1.2. 2023-01. Includes AB2002, AB2004, AB2502, AB2504 as valid devices.
 % v1.1. 2020-07. Includes different resolutions, depending on each device.
 % Accepts AB1502, AB1504, AB1902, AB1904 as valid device types.
 %
@@ -63,13 +64,17 @@ elseif numChannel >= uint8('A')
 end
 
 %% Get device type and resolution
-[~,is32bitdevice]=getDeviceTypeFromName(abacus_object);
+[device_type,is32bitdevice,num_channels]=getDeviceTypeFromName(abacus_object);
 resolution_ns = getResolutionFromName(abacus_object); %new on v1.1 (2020-07-07)
 
 %% Assign address for specific device type
-if is32bitdevice %if device_type == 1004, 1504 or 1904
-    address = 72:75;
-else%if device_type == 1002, 1502 or 1902
+if is32bitdevice %when using 32-bit devices
+    if (num_channels == 4) %devices: 1004,1504,1904,2004,2504
+        address = 72:75; %sleepA..sleepD
+    else %devices: 2002, 2502
+        address = 72:73; %sleepA,sleepB
+    end
+else%when using 16-bit devices: 1002, 1502 or 1902
     address = [8,12];
 end
 
@@ -77,7 +82,7 @@ if (numChannel <= length(address)) && (numChannel > 0)
    address =  address(numChannel);
 else
    address = 0;
-   errorStruct.message = 'Input ''channel_char'' is not a valid channel.';
+   errorStruct.message = ['Input ''channel_char'' is not a valid channel for Tausand Abacus AB',num2str(device_type)];
    errorStruct.identifier = 'TAUSAND:invalidInput';
    error(errorStruct)
 end

@@ -13,6 +13,7 @@
 %   deviceTypeQuery                     - Returns an integer with the Tausand Abacus device type.
 %   example_abacusExample               - Tausand AB1000 Matlab library example: Abacus Example
 %   example_multipleReadExample         - Tausand AB1000 Matlab library example: Multiple Read Example
+%   example_singleReadExample           - Tausand AB1000 Matlab library example: Single Read Example
 %   findDevices                         - Scans and finds serial ports with Tausand Abacus devices.
 %   idnQuery                            - Identification request *IDN?
 %   openAbacus                          - Opens and configures a Tasuand Abacus AB1000

@@ -1,11 +1,9 @@
 # Tausand_AB1000_MatlabLibrary
 Library to use Tausand Abacus AB1000 devices with Matlab
 
-(v1.2 under development)
+## About Tausand Abacus AB1000 and AB2000
 
-## About Tausand Abacus AB1000
-
-This is a family of coincidence counters, ideal to measure temporal correlations in particle detection and quantum optics experiments.
+These are families of coincidence counters, ideal to measure temporal correlations in particle detection and quantum optics experiments.
 
 To learn more about them, visit our website www.tausand.com
 
@@ -16,13 +14,13 @@ To obtain a Tausand's Abacus coincidence counter, visit our [online shop](http:/
 ### 1. Overview
 Manufacturer: Tausand <br/>
 Supported Language(s): MATLAB <br/>
-Supported Model(s): AB1002, AB1004, AB1502, AB1504, AB1902, AB1904<br/>
-Model(s) Tested: AB1002, AB1004, AB1502, AB1504<br/>
+Supported Model(s): AB1002, AB1004, AB1502, AB1504, AB1902, AB1904, AB2502, AB2504<br/>
+Model(s) Tested: AB1002, AB1004, AB1502, AB1504, AB2502, AB2504<br/>
 Interface(s): USB
 
-Driver Revision: 1.1<br/>
+Driver Revision: 1.2<br/>
 Original Release Date: 07/10/2019 (mm/dd/yyyy)<br/>
-Current Revision Date: 03/16/2021
+Current Revision Date: 01/22/2023
 
 ### 2. Contents
 
@@ -40,6 +38,7 @@ Current Revision Date: 03/16/2021
 |   deviceTypeQuery                  |   - Returns an integer with the Tausand Abacus device type.|
 |   example_abacusExample             |  - Tausand AB1000 Matlab library example: Abacus Example|
 |   example_multipleReadExample        | - Tausand AB1000 Matlab library example: Multiple Read Example|
+|   example_singleReadExample        | - Tausand AB1000 Matlab library example: Single Read Example|
 |   findDevices                        | - Scans and finds serial ports with Tausand Abacus devices.|
 |   idnQuery                           | - Identification request *IDN?|
 |   openAbacus                         | - Opens and configures a Tasuand Abacus AB1000|
@@ -62,11 +61,16 @@ To report issues or provide feedback about this instrument driver, please send a
 ### 4. Revision History
 The latest version of this and other Tausand instrument drivers can be downloaded at [Tausand downloads website](http://www.tausand.com/downloads/).
 
-* REV 1.0, 10/07/2019<br/>
+* REV 1.0, 07/10/2019<br/>
 Created by: David Guzmán, dguzman@tausand.com, Bogota, Colombia.<br/>
 Original release.
 
 
-* REV 1.1, 16/03/2021<br/>
+* REV 1.1, 03/16/2021<br/>
 Updated by: David Guzmán, dguzman@tausand.com, Bogota, Colombia.<br/>
-Added support for 2ns and 1ns devices. New examples included. New function waitAndGetValues to ease continuous acquisitions.
+Added support for 2ns and 1ns devices. New examples included. New function _waitAndGetValues_ to ease continuous acquisitions.
+
+
+* REV 1.2, 01/22/2023<br/>
+Updated by: David Guzmán, dguzman@tausand.com, Bogota, Colombia.<br/>
+Added support for AB2000 devices: AB2502 and AB2504. Improvements on read and configure functions.

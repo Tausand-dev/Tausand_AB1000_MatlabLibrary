@@ -88,7 +88,7 @@ while repeatRdWr == 1
             errorStruct.message = 'Expected first byte is not correct. Read cancelled.';
             errorStruct.identifier = 'TAUSAND:unexpectedReadByte';
             error(errorStruct) 
-            %return
+            return
         end
     end
     numBytes=fread(abacus_object,1); %2nd byte says number of bytes that follows

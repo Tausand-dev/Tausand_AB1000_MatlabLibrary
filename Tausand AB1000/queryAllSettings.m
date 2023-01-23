@@ -29,9 +29,11 @@ function [ data_out, labels_out ] = queryAllSettings( abacus_object )
 % Author: David Guzmán.
 % Tausand Electronics, Colombia.
 %
-% Created: 2019-05. Last revision: 2023-01-22. Version: 1.2.
+% Created: 2019-05. Last revision: 2023-01-23. Version: 1.2.
 %
 % v1.2. 2023-01. Includes new devices AB2002, AB2004, AB2502 and AB2504.
+%                Optimized reading in AB2000 devices using new read mode
+%                x"3". Typical read times of 12ms-14ms in AB250x devices.
 % v1.1. 2020-08. Includes new devices AB1502, AB1504, AB1902 and AB1904.
 % Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com
@@ -55,19 +57,33 @@ C2Pow16=65536;      %2^16
 C2Pow24=16777216;   %2^24
 
 %% Get device type
-[~,is32bitdevice,num_channels]=getDeviceTypeFromName(abacus_object);
+[device_type,is32bitdevice,num_channels]=getDeviceTypeFromName(abacus_object);
 
 %% Read request and wait for data available in port
 numtries = 4;
 localmaxtimeout = maxtimeout/numtries;
 if is32bitdevice && (num_channels == 4)%when using a 4-channel device: 1004, 1504, 1904, 2004, 2504
-    expectedBytes = 67; %5*11 values + 4*(2 prefix + 1 checksum)
-    address=[64,72,80,88];
-    data_value=[4,4,2,1];
+    if device_type > 2000 %v1.2
+        %since AB2000, read mode x"3" (all settings) is available
+        expectedBytes = 58; %5*(4+4+2+1)values + 1*(2prefix + 1checksum)
+        data_value=[hex2dec('03000000')]; %use value=x"03000000" to enable read mode x"3", all counters 
+        address=[0]; %address is ignored in read mode x"3".
+    else
+        expectedBytes = 67; %5*11 values + 4*(2 prefix + 1 checksum)
+        address=[64,72,80,88];
+        data_value=[4,4,2,1];
+    end
 elseif is32bitdevice && (num_channels == 2)%v1.2: when using a 2-channel device of 32-bits: 2002, 2502
-    expectedBytes = 39; %5*6 values + 3*(2 prefix + 1 checksum)
-    address=[64,72,80];
-    data_value=[2,2,2];
+    if device_type > 2000 %v1.2
+        %since AB2000, read mode x"3" (all settings) is available
+        expectedBytes = 58; %5*(4+4+2+1)values + 1*(2prefix + 1checksum). Although is a 2ch device, responds like a 4ch device in read mode x"3".
+        data_value=[hex2dec('03000000')]; %use value=x"03000000" to enable read mode x"3", all counters 
+        address=[0]; %address is ignored in read mode x"3".
+    else
+        expectedBytes = 39; %5*6 values + 3*(2 prefix + 1 checksum)
+        address=[64,72,80];
+        data_value=[2,2,2];
+    end
 else%when using a 2-channel device of 16-bits: 1002, 1502 or 1902
     expectedBytes = 69; %3*22 values + 2 prefix + 1 checksum        
     address=[0];
@@ -177,8 +193,7 @@ while repeatRdWr == 1
     
     if is32bitdevice %when using 32-bit devices: 1004, 1504, 1904, 2002, 2004, 2502 or 2504
         data_out=data_out(:,1)*C2Pow24+data_out(:,2)*C2Pow16+data_out(:,3)*C2Pow8+data_out(:,4);
-        
-        if num_channels == 4 %when using 4-channel devices: 1004, 1504, 1904, 2004, 2504
+        if (num_channels == 4) || ((device_type > 2000) && (num_channels == 2)) %when using 4-channel devices: 1004, 1504, 1904, 2004, 2504, or when 2ch of AB2xx2
             addresses_ok=isequal(sort(addresses_out)',[64:67,72:75,80,81,88]);
         else %v1.2: when using 2-channel devices: 2002, 2502
             addresses_ok=isequal(sort(addresses_out)',[64,65,72,73,80,81]);

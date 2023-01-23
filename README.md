@@ -1,5 +1,5 @@
 # Tausand_AB1000_MatlabLibrary
-Library to use Tausand Abacus AB1000 devices with Matlab
+Library to use Tausand Abacus AB1000 and AB2000 devices with Matlab.
 
 ## About Tausand Abacus AB1000 and AB2000
 

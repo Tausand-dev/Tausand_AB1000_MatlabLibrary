@@ -35,11 +35,13 @@ function [ data_out, labels_out ] = readMeasurement( abacus_object )
 % Author: David Guzmán.
 % Tausand Electronics, Colombia.
 %
-% Created: 2019-05. Last revision: 2023-01-22. Version: 1.2.
+% Created: 2019-05. Last revision: 2023-01-23. Version: 1.2.
 %
 % v1.2. 2023-01. Validates number of channels to create labels.
 %                Includes new devices AB2002, AB2004, AB2502 and AB2504.
 %                Pauses 1ms until serial device sends a response.
+%                Optimized reading in AB2000 devices using new read mode
+%                x"2". Typical read times of 13ms-15ms in AB250x devices.                
 % v1.1. 2020-09. Includes new devices AB1502, AB1504, AB1902 and AB1904.
 %       2021-03. Returns unsigned integer.
 % Contact email: dguzman@tausand.com. 
@@ -74,19 +76,34 @@ C2Pow16=65536;      %2^16
 C2Pow24=16777216;   %2^24
 
 %% Get device type
-[~,is32bitdevice,num_channels]=getDeviceTypeFromName(abacus_object);
+[device_type,is32bitdevice,num_channels]=getDeviceTypeFromName(abacus_object);
 
 %% Read request and wait for data available in port
 
 if is32bitdevice && (num_channels == 4)%when using a 4-channel device: 1004, 1504, 1904, 2004, 2504
-    expectedBytes = 83; %5*(4+3+2+1+2+1)values + 6*(2prefix + 1checksum)
-    address=[0,9,18,27,83,96];
-    data_value=[4,3,2,1,2,1];
+    if device_type > 2000 %v1.2
+        %since AB2000, read mode x"2" (all counters) is available
+        expectedBytes = 68; %5*(4+3+2+1+2+1)values + 1*(2prefix + 1checksum)
+        data_value=[hex2dec('02000000')]; %use value=x"02000000" to enable read mode x"2", all counters 
+        address=[0]; %address is ignored in read mode x"2".
+    else
+        expectedBytes = 83; %5*(4+3+2+1+2+1)values + 6*(2prefix + 1checksum)
+        address=[0,9,18,27,83,96];
+        data_value=[4,3,2,1,2,1];
+    end
+    
     av=[address;data_value];
 elseif is32bitdevice && (num_channels == 2)%v1.2: when using a 2-channel device of 32-bits: 2002, 2502
-    expectedBytes = 34; %5*(2+1+2)values + 3*(2prefix + 1checksum)
-    address=[0,9,83];
-    data_value=[2,1,2];
+    if device_type > 2000
+        %since AB2000, read mode x"2" (all counters) is available
+        expectedBytes = 68; %5*(4+3+2+1+2+1)values + 1*(2prefix + 1checksum). Although is a 2ch device, responds like a 4ch device in read mode x"2".
+        data_value=[hex2dec('02000000')]; %use value=x"02000000" to enable read mode x"2", all counters 
+        address=[0]; %address is ignored in read mode x"2".
+    else
+        expectedBytes = 34; %5*(2+1+2)values + 3*(2prefix + 1checksum)
+        address=[0,9,83];
+        data_value=[2,1,2];
+    end
     av=[address;data_value];
 else%when using a 2-channel device of 16-bits: 1002, 1502 or 1902
     expectedBytes = 18; %3*5 values + 2 prefix + 1 checksum
@@ -238,7 +255,7 @@ while repeatRdWr == 1
     %tic
     if is32bitdevice %when using 32-bit devices: 1004, 1504, 1904, 2002, 2004, 2502 or 2504
         data_out=data_out(:,1)*C2Pow24+data_out(:,2)*C2Pow16+data_out(:,3)*C2Pow8+data_out(:,4);
-        if num_channels == 4 %when using 4-channel devices: 1004, 1504, 1904, 2004, 2504
+        if (num_channels == 4) || ((device_type > 2000) && (num_channels == 2)) %when using 4-channel devices: 1004, 1504, 1904, 2004, 2504, or when using 2-ch AB2xx2
             addresses_ok=isequal(sort(addresses_out),[0;1;2;3;9;10;11;18;19;27;83;84;96]);
         else %v1.2: when using 2-channel devices: 2002, 2502
             addresses_ok=isequal(sort(addresses_out),[0;1;9;83;84]);

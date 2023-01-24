@@ -20,7 +20,7 @@ Interface(s): USB
 
 Driver Revision: 1.2<br/>
 Original Release Date: 07/10/2019 (mm/dd/yyyy)<br/>
-Current Revision Date: 01/22/2023
+Current Revision Date: 01/24/2023
 
 ### 2. Contents
 
@@ -68,9 +68,13 @@ Original release.
 
 * REV 1.1, 03/16/2021<br/>
 Updated by: David Guzmán, dguzman@tausand.com, Bogota, Colombia.<br/>
-Added support for 2ns and 1ns devices. New examples included. New function _waitAndGetValues_ to ease continuous acquisitions.
+Added support for 2ns and 1ns devices.
+New examples included.
+New function _waitAndGetValues_ to ease continuous acquisitions.
 
 
-* REV 1.2, 01/22/2023<br/>
+* REV 1.2, 01/24/2023<br/>
 Updated by: David Guzmán, dguzman@tausand.com, Bogota, Colombia.<br/>
-Added support for AB2000 devices: AB2502 and AB2504. Improvements on read and configure functions.
+Added support for AB2000 devices: AB2502 and AB2504.
+New examples included.
+Improvements on read and configure functions.

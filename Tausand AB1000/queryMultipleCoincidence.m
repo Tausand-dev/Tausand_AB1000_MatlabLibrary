@@ -53,8 +53,9 @@ function [ config_string, config_value ] = queryMultipleCoincidence( abacus_obje
 % Author: David Guzmán.
 % Tausand Electronics, Colombia.
 %
-% Created: 2019-05. Last revision: 2021-03-15. Version: 1.1.
+% Created: 2019-05. Last revision: 2023-01-22. Version: 1.2.
 %
+% v1.2. 2023-01. Validates number of channels, instead of device type.
 % v1.1. 2020-08. Includes new devices AB1502, AB1504, AB1902 and AB1904.
 % Contact email: dguzman@tausand.com. 
 % Website: http://www.tausand.com
@@ -70,10 +71,10 @@ config_value = -1;
 config_string = "";
 
 %% Get device type
-[device_type,is32bitdevice]=getDeviceTypeFromName(abacus_object);
+[device_type,is32bitdevice,num_channels]=getDeviceTypeFromName(abacus_object);
 
 %% Read addresses for specific device type
-if is32bitdevice %if device_type == 1004, 1504 or 1904
+if (is32bitdevice) && (num_channels > 2) %v1.2: validates number of channels
     address = 88;
     config_value=readSingleRegister(abacus_object,address);
     

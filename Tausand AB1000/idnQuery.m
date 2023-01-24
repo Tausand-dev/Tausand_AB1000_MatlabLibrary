@@ -20,8 +20,9 @@ function [ idn ] = idnQuery( abacus_object )
 % Author: David Guzmán.
 % Tausand Electronics, Colombia.
 %
-% Created: 2019-05. Last revision: 2021-03-15. Version: 1.1.
+% Created: 2019-05. Last revision: 2023-01-22. Version: 1.2.
 %
+% v1.2. 2023-01. remove non-printable characters to the string response
 % v1.1. 2020-07. '\n' added at the end of request: '*IDN?\n'
 %
 % Contact email: dguzman@tausand.com. 
@@ -82,5 +83,9 @@ if toc(tIdnQuery) > maxtimeout
     warning('TAUSAND:timeout','Timeout in function idnQuery.')
     %toc(tIdnQuery);
 end
+
+
+%v1.2: remove all non-printable characters, i.e. with Ascii lower than 32. E.g.: \0A and \00 are removed
+idn=idn(idn>31);
 
 end

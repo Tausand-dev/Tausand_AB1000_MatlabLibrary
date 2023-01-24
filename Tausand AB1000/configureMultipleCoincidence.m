@@ -59,8 +59,8 @@ function [ config_string, config_value ] = configureMultipleCoincidence( abacus_
 % Author: David Guzmán.
 % Tausand Electronics, Colombia.
 %
-% Created: 2019-05. Last revision: 2021-03-15. Version: 1.1.
-%
+% Created: 2019-05. Last revision: 2023-01-22. Version: 1.2.
+% v1.2. 2023-01. Validates number of channels, instead of device type.
 % v1.1. 2020-07. Includes AB1504 and AB1904 as valid device types.
 %
 % Contact email: dguzman@tausand.com. 
@@ -76,18 +76,18 @@ function [ config_string, config_value ] = configureMultipleCoincidence( abacus_
     config_value = -1;
 
     %% Get device type
-    device_type=getDeviceTypeFromName(abacus_object);
+    [device_type,~,num_channels]=getDeviceTypeFromName(abacus_object);
 
     %% Read addresses for specific device type
-    if ismember(device_type,[1002,1502,1902])
-        warning('TAUSAND:incorrectType',['Multiple coincidence feature does not exist in Tausand Abacus ',num2str(device_type)])
+    if num_channels <= 2 %v1.2: validates number of channels
+        warning('TAUSAND:incorrectType',['Multiple coincidence feature does not exist in Tausand Abacus AB',num2str(device_type)])
         return
     elseif device_type == 0
         errorStruct.message = 'Non-valid device type found for multiple coincidences.';
         errorStruct.identifier = 'TAUSAND:incorrectType';
         error(errorStruct)
         %return
-    else%if device_type == 1004, 1504 or 1904
+    else %if device_type exists, and has more than 3 channels
 
         %% String coerce
         config_string = unique(char(upper(config_string))); %sorts and removes repeated letters

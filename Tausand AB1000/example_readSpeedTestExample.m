@@ -1,7 +1,8 @@
 %% Tausand AB1000 Matlab library example: Read Speed Test Example
 % Repeat reading of counters and settings for a specified number of times, and returns statistics on the timing of execution of these reading functions: 
-%    * readMeasurement()
-%    * queryAllSettings()
+% 
+% * readMeasurement()
+% * queryAllSettings()
 %
 % Author: David Guzmán.
 % Tausand Electronics, Colombia.
@@ -12,12 +13,11 @@
 % Website: http://www.tausand.com
 
 %% User's parameters
-port = 'COM7';  %indicate the port to connect with. E.g.: 'COM4'
+port = 'COM6';  %indicate the port to connect with. E.g.: 'COM4'
 samples = 1000;  %how many times the read test should be made
 
 %% Connection with Tausand Abacus device
-
-%open connection with device
+% Open connection with device
 my_tausand = openAbacus(port);
 
 idn_string = idnQuery(my_tausand);
@@ -26,21 +26,23 @@ fprintf(idn_string);
 fprintf("\n");
 
 %% Read speed tests
-
-%create empty arrays
+% Create empty arrays
 tRdCounters=zeros(samples,1);
 tRdSettings=zeros(samples,1);
+%%
+% Do not show this type of warnings
+warning('off','TAUSAND:timeout'); 
 
-lastfailk=0;
-
-warning('off','TAUSAND:timeout'); %do not show this type of warnings
-
+%%
+% Print in command window progress percentage
 fprintf("Read speed test. Progress=%5.1f%%",0);
 k=1;
 if samples < k
     samples = k;
 end
 
+%%
+% Perform reading tests, and get their timing
 while k <= samples
     try
         stopwatch = tic();
@@ -51,8 +53,8 @@ while k <= samples
         q=queryAllSettings(my_tausand);
         tRdSettings(k,1)=toc(stopwatch);
         
-        %if both stopwatchs are non-zero, measument is ok. Go to next
-        %mesurement.
+        % if both stopwatchs are non-zero, measument is ok. Go to next
+        % mesurement.
         if (tRdCounters(k,1) > 0) && (tRdSettings(k,1) > 0)
             k=k+1; %go to next reading
         end
@@ -78,7 +80,9 @@ while k <= samples
 end
 fprintf("\n");
 
-warning('on','TAUSAND:timeout'); %enable back those warnings that were turned off
+%%
+% Enable back those warnings that were turned off:
+warning('on','TAUSAND:timeout'); 
 
 %% Close connection
 
